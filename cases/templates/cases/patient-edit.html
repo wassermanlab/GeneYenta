@@ -1,0 +1,120 @@
+{% extends 'cases/base.html' %}
+
+{% block title %}GeneYenta Edit Case{% endblock %}
+
+{% block header %} Edit a pre-existing case{% endblock %}
+
+
+{% block content %}
+
+{% ssi '/Users/etadministrator/Sites/django_sites/geneyenta_mk3/cases/static/cases/dynatree/dev/FullTree.html' parsed %}
+
+
+
+<h2> Patient System ID Number: {{patient.id}} </h2>
+<form name='patient-form' id="form" method="POST">
+        {% csrf_token %}
+        <div id='json'>{{form.json}}</div>
+        {{form.as_p}}
+        
+        <input type="submit" value="Submit"/>
+</form>
+
+
+<script type="text/javascript">
+
+$(document).ready(function (){
+//alert('hello');
+var old_phenotypes = {{old_json|safe}};
+// var obj = JSON.parse(old_phenotypes);
+for (var hpo_id in old_phenotypes) {
+	//alert(hpo_id);
+	//alert(old_phenotypes[index]);
+	$("#tree").dynatree("getTree").selectKey(hpo_id, true);
+	selectAllWithID(hpo_id, true);
+	var identifier = 'importance'+hpo_id;
+	//alert(identifier);
+	$('input:radio[name=importance'+hpo_id+'][value='+old_phenotypes[hpo_id]+']').prop('checked', true);
+}
+});
+
+
+$('#form').submit(function(evt) {
+	var terms = new Array();
+	$( ".selected" ).each(function( index ) {
+ 		var single_term = new Object();
+ 		var id = $(this).attr('id'); //hpo id
+ 		single_term.hpo_id = id; 		
+ 		single_term.description = $(this).attr('title'); //human readable title
+ 		var radio = $(this).find('input:radio[name=importance'+id+']:checked'); //importance rating
+ 		if (radio.length > 0) { //if radio.length == 0; then no rating has been selected
+            single_term.importance = radio.val();
+            terms.push(single_term);//adds its to the array
+        } else {
+            alert('You have not selected an importance rating for \"'+single_term.description+'\".');
+            evt.preventDefault(); //stops form submission
+        }
+
+	});  
+	var result = JSON.stringify(terms);
+	$('#id_json').val(result);//sets the value of the hidden element to the json-string
+});
+
+
+</script>
+
+{% endblock %}
+
+
+{% block endbody %}
+
+<script src="{{ STATIC_URL }}cases/validate.js" type="text/javascript"></script>
+<script type="text/javascript">
+var validator = new FormValidator('patient-form', [{
+    name: 'case_summary',
+    display: '\"Case summary\"',    
+    rules: 'required'
+}, {
+    name: 'institute',
+    display: '\"Institute\"',  
+    rules: 'required'
+}, {
+    name: 'clinic',
+    display: '\"Clinic\"',
+    rules: 'required',
+}, {
+    name: 'gender',
+    display: '\"Gender\"',
+    rules: 'required',
+}, {
+    name: 'first_appointment_date_month', //should be made optional...in models.py
+    display: '\"First appointment month field\"',
+    rules: 'required',
+}, {
+	name: 'first_appointment_date_day',
+    display: '\"First appointment day field\"',
+	rules: 'required'
+}, {  
+	name: 'first_appointment_date_year',
+    display: '\"First appointment year field\"',
+	rules: 'required',
+}, {
+	name: 'first_appointment_age',
+    display: '\"First appointment age field\"',
+	rules: 'required',
+}], function(errors, event) {
+    if (errors.length > 0) {
+       var errorString = '';  
+        for (var i = 0, errorLength = errors.length; i < errorLength; i++) {
+            errorString += errors[i].message + '\n';
+        }    
+        alert('You have left some fields empty!\nPlease remedy these errors before submitting:\n'+errorString);
+    }       
+    }
+
+);
+
+
+</script>
+ 
+{% endblock %}

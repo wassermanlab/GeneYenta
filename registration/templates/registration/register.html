@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<body>
+	<h2> GeneYenta Registration </h2>
+{% if form.errors %}
+{{form.errors}}
+{% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+        {{userform}}
+    </br></br>
+        {{userprofileform}}
+        <input type="submit" value="Submit"/>
+    </form>
+</body>
+</html>

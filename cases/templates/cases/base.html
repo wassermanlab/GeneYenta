@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>{% block title %}{% endblock %}</title>
+</head>
+<span>{% url 'django.contrib.auth.views.logout' as logout %}
+    <a href="{{logout}}"> Click here to logout </a> </span>
+<h1> {%	block header %} {% endblock %} </h1>
+<body>
+    <div id="sidebar">
+        {% block sidebar %}
+        <ul>
+            {% url 'cases.views.inbox' as inbox %}
+            {% url 'cases.views.view_cases' as cases %}
+            {% url 'cases.views.matches' as matches %}
+            {% url 'cases.views.settings' as settings %}
+
+
+            <li><a href="{{inbox}}">Inbox</a></li>
+            <li><a href="{{cases}}">Cases</a></li>
+            <li><a href="{{matches}}">Matches</a></li>
+            <li><a href="{{settings}}">Settings</a></li>
+        </ul>
+        {% endblock %}
+    </div>
+
+    <div id="content">
+        {% block content %}{% endblock %}
+    </div>
+
+     {% block endbody %}{% endblock %}
+</body>
+</html>

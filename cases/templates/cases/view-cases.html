@@ -1,0 +1,27 @@
+{% extends 'cases/base.html' %}
+
+{% block title %}GeneYenta View Cases{% endblock %}
+
+{% block header %} {{profile.name}}'s Cases{% endblock %}
+
+
+{% block content %}
+
+
+<h1> Viewing all cases </h1>
+{% if patient_list %}
+
+
+	<ul>
+	{% for patient in patient_list %}	
+		<li><a href="{% url 'cases.views.patient_detail' patient.id %}"> {{patient.id}} </a></li>
+	{% endfor %}
+	</ul>
+
+{% else %}
+	<h3> You haven't added any cases </h3>
+{% endif %}
+
+{% url 'cases.views.create_case' as create_case %}
+<a href="{{create_case}}"> Create a new case </a>
+{% endblock %}

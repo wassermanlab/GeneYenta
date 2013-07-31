@@ -1,0 +1,18 @@
+{% extends 'cases/base.html' %}
+
+{% block title %}GeneYenta Edit Profile{% endblock %}
+
+{% block header %} Edit your user profile{% endblock %}
+
+
+{% block content %}
+
+<h2> Profile System ID Number: {{clinician.id}} </h2>
+<h3> Username: {{user.username}} </h3>
+<form method="POST">
+        {% csrf_token %}
+        {{form.as_p}}
+        <input type="submit" value="Submit"/>
+    </form>
+
+{% endblock %}

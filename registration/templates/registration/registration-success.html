@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<body>
+	<h2> Registration Success! </h2>
+	<h2> A confirmation email has been sent to the email address that you entered</h2>
+	<h3> If you have not recieved this email in the next 24hrs there has been an error processesing your
+		request. Please check your SPAM folders to be sure. </h3>
+	<p> You will be unable to log in to geneyenta until an administrator has approved your account. </br>
+		However, you will receive an email when your account has been approved.
+	</p>
+
+	{% url 'django.contrib.auth.views.login' as login_page %}
+	<a href="{{login_page}}"> Click here to login </a>
+
+
+</body>
+</html>
+

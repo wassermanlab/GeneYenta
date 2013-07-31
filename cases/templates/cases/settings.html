@@ -1,0 +1,12 @@
+{% extends 'cases/base.html' %}
+
+{% block title %}GeneYenta Settings{% endblock %}
+
+{% block header %} {{profile.name}}'s Settings{% endblock %}
+
+
+{% block content %}
+<h1> A settings form, probably </h1>
+<a href="{% url 'cases.views.profile_edit' user.clinician.id %}">Edit your user profile</a>
+
+{% endblock %}

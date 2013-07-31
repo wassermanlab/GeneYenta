@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+	<h2> Successfully reset your password </h2>
+		{% url 'django.contrib.auth.views.login' as login_page %}
+	<a href="{{login_page}}"> Click here to login </a>
+</body>
+</html>

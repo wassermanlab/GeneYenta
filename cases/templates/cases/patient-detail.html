@@ -1,0 +1,34 @@
+{% extends 'cases/base.html' %}
+
+{% block title %}GeneYenta Case Detail{% endblock %}
+
+{% block header %} Patient Detail {% endblock %}
+
+{% block content %}
+
+<h2> Patient System ID: {{patient.id}} </h2>
+<h5> Clinic: {{patient.clinic}} </h5>
+<h5> Institute: {{patient.institute}} </h5>
+<h4> Case Summary </h4>
+<p> {{patient.case_summary}} </p>
+
+<a href="{% url 'cases.views.patient_edit' patient.id %}"> Edit this patient </a>
+
+<ul>
+{% if phenotypes %}
+<h5>Phenotypes</h5>
+
+{% for p in phenotypes %}
+	<li>{{p.description}}</li>
+{% endfor %}
+</ul>
+
+{% else %}
+
+<h5> You haven't associated any phenotypes for this case </h5>
+
+{% endif %}
+
+
+
+{% endblock %}

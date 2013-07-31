@@ -1,0 +1,15 @@
+{% extends 'cases/base.html' %}
+
+{% block title %}Forbidden Request{% endblock %}
+
+{% block header %}Oh hai.{% endblock %}
+
+{% block content %}
+<h2> It seems you've tried to access some data that isn't yours...</h2>
+<h6> That's not very nice. </h6>
+
+<h2> I'm willing to let it go as an accident...</h2>
+<a href="{% url 'inbox' %}"> Click here to return to your inbox</a>
+
+
+{% endblock %}
