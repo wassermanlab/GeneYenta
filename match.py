@@ -33,12 +33,22 @@ class Service:
 	def matchAll(self):
 		for caseA in self.cases:
 			for caseB in self.cases:
-				if (caseA.id >= caseB.id or self.alreadyMatched(caseA, caseB)):
-					print "match already exists"
-					continue
+				if caseA.id >= caseB.id :
+					print "skipping match of " + str(caseA.id) + " and " + str(caseB.id)
+					continue 
+
 				ABScore = caseA.getMatchPercent(caseB)
 				BAScore = caseB.getMatchPercent(caseA)
-				newMatch = Match(caseA, caseB, ABScore, BAScore)
+				newMatch = Match(caseA.id, caseB.id, ABScore, BAScore)
+
+				if self.alreadyMatched(caseA, caseB):
+					print "updating match of " + str(caseA.id) + " and " + str(caseB.id)
+					newMatch.updateDB()
+					continue
+					
+				ABScore = caseA.getMatchPercent(caseB)
+				BAScore = caseB.getMatchPercent(caseA)
+				newMatch = Match(caseA.id, caseB.id, ABScore, BAScore)
 				self.matches.append(newMatch)
 				newMatch.writeToDB()
 				print "matchWritten"
@@ -57,7 +67,11 @@ class Match:
 		self.BAScore = BAScore
 
 	def writeToDB(self):
-		sql = "INSERT INTO cases_match (patient1_id, patient2_id, score12, score21) VALUES (" +  str(self.caseA.id) +", "+ str(self.caseB.id) +", "+ str(self.ABScore) +", "+ str(self.BAScore) +  ")"
+		sql = "INSERT INTO cases_match (patient1_id, patient2_id, score12, score21) VALUES (" +  str(self.caseAID) +", "+ str(self.caseBID) +", "+ str(self.ABScore) +", "+ str(self.BAScore) +  ")"
+		cur.execute(sql)
+
+	def updateDB(self):
+		sql = "update cases_match set score12 = " + str(self.ABScore) + ", score21 = " + str(self.BAScore) + " where patient1_id = " + str(self.caseAID) + " and patient2_id = " + str(self.caseBID) 
 		cur.execute(sql)
 
 class Case:
@@ -149,7 +163,7 @@ def main():
 	print ""
 	print "All matched tuples:"
 	for m in s.matches:
-		print str(m.caseAID) +" " + str(m.caseBID)
+		print str(m.caseAID) +" " + str(m.caseBID) + " 12Score = " + str(m.ABScore) + " 21Score = "+str(m.BAScore)
 
 if __name__ == "__main__":
 	main()
