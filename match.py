@@ -51,7 +51,7 @@ class Service:
 				newMatch = Match(caseA.id, caseB.id, ABScore, BAScore)
 				self.matches.append(newMatch)
 				newMatch.writeToDB()
-				print "matchWritten"
+				print "writing match of " + str(caseA.id) + " and " + str(caseB.id)"
 
 	def alreadyMatched(self, caseA, caseB):
 		for match in self.matches:
@@ -106,10 +106,10 @@ class Case:
 	def generateTermSet(self):
 		allTerms = []
 		for term in self.terms:
-			if (term not in allTerms):
+			if term not in allTerms:
 				allTerms.append(term)
 			for parent in term.getAllParents():
-				if (parent not in allTerms):
+				if parent not in allTerms:
 					allTerms.append(parent)
 		return allTerms
 
