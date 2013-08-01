@@ -1,26 +1,24 @@
 import math
 import MySQLdb
 
+NO_MATCH = -1
 threshold = .75
 db=MySQLdb.connect(host="localhost",user="gyadmin",passwd="gnytdmpw",db="GeneYenta")
 cur = db.cursor()
 
 class Service:
-	_instance = None
 	def __init__(self):
-		if _instance != None:
-			return _instance
 		self.cases = self.getCases()
 		self.matches = self.getMatches()
-		_instance = self
-		
+
 	def getMatches(self):
 		matches = []
-		sql = "SELECT * FROM matches"
+		sql = "SELECT * FROM cases_match"
 		cur.execute(sql)
-		row = cur.fetchall()
-		for row in rows
-			matches.append(Match(row[1],row[0],row[2],row[3]))
+		rows = cur.fetchall()
+		print rows
+		for row in rows:
+			matches.append(Match(row[1],row[2],row[3],row[4]))
 		return matches
 
 	def getCases(self):
@@ -35,39 +33,41 @@ class Service:
 	def matchAll(self):
 		for caseA in self.cases:
 			for caseB in self.cases:
-				if caseA == caseB or alreadyMatched(caseA, caseB):
+				if (caseA.id == caseB.id or self.alreadyMatched(caseA, caseB)):
+					print "match already exists"
 					continue
 				ABScore = caseA.getMatchPercent(caseB)
 				BAScore = caseB.getMatchPercent(caseA)
 				newMatch = Match(caseA, caseB, ABScore, BAScore)
-				matches.append(newMatch)
+				self.matches.append(newMatch)
 				newMatch.writeToDB()
+				print "matchWritten"
 
 	def alreadyMatched(self, caseA, caseB):
 		for match in self.matches:
-			if (match.caseA == caseA and match.caseB == caseB) or  (match.caseB == caseA and match.caseA == caseB):
+			if (match.caseAID == caseA.id and match.caseBID == caseB.id) or  (match.caseBID == caseA.id and match.caseAID == caseB.id):
 				return True
 		return False
 
 class Match:
-	def _init_(self, caseA, caseB, ABScore, BAScore):
-		self.caseA = caseA
-		self.caseB = caseB
+	def __init__(self, caseAID, caseBID, ABScore, BAScore):
+		self.caseAID = caseAID
+		self.caseBID = caseBID
 		self.ABScore = ABScore
 		self.BAScore = BAScore
-	
-	def writeToDB(self, caseA, caseB, ABScore, BAScore):
-		sql = "INSERT INTO matches (CaseA, CaseB, ABScore, BAScore) VALUES (" + caseA +", "+ caseB +", "+ ABScore +", "+ BAScore +  ")"
+
+	def writeToDB(self):
+		sql = "INSERT INTO cases_match (patient1_id, patient2_id, score12, score21) VALUES (" +  str(self.caseA.id) +", "+ str(self.caseB.id) +", "+ str(self.ABScore) +", "+ str(self.BAScore) +  ")"
 		cur.execute(sql)
 
 class Case:
-	def __init__(self, id, terms):
+	def __init__(self, id):
 		self.id = id
 		self.terms = self.getTerms()
 
 	def getTerms(self):
 		terms = []
-		termSQL = "SELECT hpo_id, relevancy_score FROM cases_phenotype where patient_id = "+ self.id
+		termSQL = "SELECT hpo_id, relevancy_score FROM cases_phenotype where patient_id = "+ str(self.id)
 		cur.execute(termSQL)
 		termRows= cur.fetchall()
 		for tRow in termRows:
@@ -84,7 +84,7 @@ class Case:
 		for selectedTerm in self.terms:
 			matchDenominator+= (selectedTerm.score * selectedTerm.weight)
 			bestScore = selectedTerm.findBestMatch(termList)
-			if bestScore == -1:
+			if bestScore == NO_MATCH:
 				bestScore = selectedTerm.matchAncestorsToCase(termList)
 			matchNumerator += (bestScore * selectedTerm.weight)
 		return matchNumerator/matchDenominator
@@ -121,7 +121,7 @@ class PhenoTerm:
 		return allParents
 
 	def findBestMatch(self, termList):
-		bestScore = -1
+		bestScore = NO_MATCH
 		for t in termList:
 			if t.id == self.id:
 				if self.score > bestScore:
@@ -129,7 +129,7 @@ class PhenoTerm:
 		return bestScore
 
 	def matchAncestorsToCase(self, termList):
-		bestScore = -1
+		bestScore = NO_MATCH
 		for parent in self.getAllParents():
 			matchScore =  parent.findBestMatch(termList)
 			if matchScore > bestScore:
@@ -137,15 +137,19 @@ class PhenoTerm:
 		return bestScore
 
 def main():
-	term = PhenoTerm("HP_0007010", 1) 
-	print "Case x from y's perspective:"
-	print y.getMatchPercent(x)
-	print "Case y from x's perspective:"
-	print x.getMatchPercent(y)
-	print "Their mutual match average:"
-	print (x.getMatchPercent(y) + y.getMatchPercent(x))/2
-	print "Their mutual match sqr root:"
-	print math.sqrt(x.getMatchPercent(y) * y.getMatchPercent(x))
+	s = Service()
+	print "Case info"
+	for c in s.cases:
+		print c.id
+		for t in c.terms:
+			print t.id
+	print ""
+	print "trying to match"
+	s.matchAll()
+	print ""
+	print "All matched tuples:"
+	for m in s.matches:
+		print str(m.caseAID) +" " + str(m.caseBID)
 
 if __name__ == "__main__":
 	main()
