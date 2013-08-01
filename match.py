@@ -161,7 +161,7 @@ def main():
 	print "trying to match"
 	s.matchAll()
 	print ""
-	print "All matched tuples:"
+	print "All matched pairs:"
 	for m in s.matches:
 		print str(m.caseAID) +" " + str(m.caseBID) + " 12Score = " + str(m.ABScore) + " 21Score = "+str(m.BAScore)
 
