@@ -45,7 +45,7 @@ class Service:
 					print "updating match of " + str(caseA.id) + " and " + str(caseB.id)
 					newMatch.updateDB()
 					continue
-					
+
 				ABScore = caseA.getMatchPercent(caseB)
 				BAScore = caseB.getMatchPercent(caseA)
 				newMatch = Match(caseA.id, caseB.id, ABScore, BAScore)
