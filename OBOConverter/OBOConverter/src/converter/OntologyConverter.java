@@ -31,36 +31,56 @@ public class OntologyConverter {
 		Ontology o = os.getOntologies().get(0);
 		OntologyTerm hpoRoot = os.getRootTerms(o).get(0);
 		
-		FileWriter jsonWriter = new FileWriter("hpo.json");
-		jsonWriter.append("children: [");
-		writeJSONNested(hpoRoot, os, jsonWriter, 0, true);
-		jsonWriter.append("]");
-		jsonWriter.flush();
-		jsonWriter.close();
+//		FileWriter jsonWriter = new FileWriter("hpo.json");
+//		jsonWriter.append("children: [");
+//		writeJSONNested(hpoRoot, os, jsonWriter, 0, true);
+//		jsonWriter.append("]");
+//		jsonWriter.flush();
+//		jsonWriter.close();
 		
 		String rootAccession = os.getRootTerms(o).get(0).getAccession();
-		allTermsInTree = os.getAllChildren(o.getOntologyAccession(), rootAccession).size() + 1;
+//		allTermsInTree = os.getAllChildren(o.getOntologyAccession(), rootAccession).size() + 1;
 		
-		FileWriter labelIDScoreWriter = new FileWriter("labelIDScore.txt");
-
-		writeScoreTDL(o, hpoRoot, os, labelIDScoreWriter);
-		labelIDScoreWriter.flush();
-		labelIDScoreWriter.close();
+//		FileWriter labelIDScoreWriter = new FileWriter("labelIDScore.txt");
+//
+//		writeScoreTDL(o, hpoRoot, os, labelIDScoreWriter);
+//		labelIDScoreWriter.flush();
+//		labelIDScoreWriter.close();
+//		
+//		FileWriter lineageWriter = new FileWriter("lineage.txt");
+//		writeLineageTDL(o, hpoRoot, os, lineageWriter);
+//		lineageWriter.flush();
+//		lineageWriter.close();
+//		
+//		FileWriter parentageWriter = new FileWriter("parentage.txt");
+//		writeparentageTDL(o, hpoRoot, os, parentageWriter);
+//		parentageWriter.flush();
+//		parentageWriter.close();
 		
-		FileWriter lineageWriter = new FileWriter("lineage.txt");
-		writeLineageTDL(o, hpoRoot, os, lineageWriter);
-		lineageWriter.flush();
-		lineageWriter.close();
-		
-		FileWriter parentageWriter = new FileWriter("parentage.txt");
-		writeparentageTDL(o, hpoRoot, os, parentageWriter);
-		parentageWriter.flush();
-		parentageWriter.close();
+		FileWriter searchWriter = new FileWriter("search.json");
+		writeJSONForSearch(o, hpoRoot, os, searchWriter);
+		searchWriter.flush();
+		searchWriter.close();
 
 	}
 	
 
-	
+	private static void writeJSONForSearch(Ontology o, OntologyTerm root, OntologyService os,
+			FileWriter writer) throws IOException, OntologyServiceException{
+		writer.append("{");
+		writer.append("\n");
+		writer.append("\"terms\": [");
+		for (OntologyTerm ot: os.getAllChildren(o.getOntologyAccession(),root.getAccession())){
+			writer.append("\n");
+			writer.append("{ \"key\": ");
+			writer.append("\"" + ot.getAccession() + "\", ");
+			writer.append(" \"label\": ");
+			writer.append("\"" + ot.getLabel() + "\" },");
+		}
+		writer.append("]");
+		writer.append("\n");
+		writer.append("}");
+	}
 	private static void writeparentageTDL(Ontology o, OntologyTerm root, OntologyService os,
 			FileWriter writer) throws IOException, OntologyServiceException {
 		writer.append(root.getAccession());
