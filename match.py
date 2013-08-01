@@ -33,7 +33,7 @@ class Service:
 	def matchAll(self):
 		for caseA in self.cases:
 			for caseB in self.cases:
-				if (caseA.id == caseB.id or self.alreadyMatched(caseA, caseB)):
+				if (caseA.id >= caseB.id or self.alreadyMatched(caseA, caseB)):
 					print "match already exists"
 					continue
 				ABScore = caseA.getMatchPercent(caseB)
