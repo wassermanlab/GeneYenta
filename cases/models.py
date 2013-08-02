@@ -70,7 +70,7 @@ class Phenotype(models.Model):
 	description = models.CharField(max_length=255)
 
 	def __unicode__(self):
-		return unicode(self.description + '  ' + self.hpo_id)
+		return unicode("Patient {0}: {1}".format(self.patient.id, self.hpo_id))
 
 # Class: Match
 # Represents a match between two patients.
