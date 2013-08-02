@@ -51,7 +51,7 @@ class Service:
 				newMatch = Match(caseA.id, caseB.id, ABScore, BAScore)
 				self.matches.append(newMatch)
 				newMatch.writeToDB()
-				print "writing match of " + str(caseA.id) + " and " + str(caseB.id)"
+				print "writing match of " + str(caseA.id) + " and " + str(caseB.id)
 
 	def alreadyMatched(self, caseA, caseB):
 		for match in self.matches:
