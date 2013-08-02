@@ -52,6 +52,7 @@ class Service:
 				self.matches.append(newMatch)
 				newMatch.writeToDB()
 				print "writing match of " + str(caseA.id) + " and " + str(caseB.id)
+		db.commit()
 
 	def alreadyMatched(self, caseA, caseB):
 		for match in self.matches:
