@@ -49,8 +49,8 @@ class Patient(models.Model):
 	private_id = models.CharField(max_length=20) #encrypted?
 
 	#System-set fields
-	date_added = models.DateField(auto_now_add=True)
-	last_modified = models.DateField(auto_now=True)
+	date_added = models.DateTimeField(auto_now_add=True)
+	last_modified = models.DateTimeField(auto_now=True)
 
 
 	def __unicode__(self):
@@ -65,12 +65,23 @@ class Patient(models.Model):
 # relevancy rating
 class Phenotype(models.Model):
 	patient = models.ForeignKey(Patient)
-	description = models.CharField(max_length=100)
-	hpo_id = models.CharField(max_length=100)
+	hpo_id = models.CharField(max_length=10)
 	relevancy_score = models.IntegerField(default=0)
+	description = models.CharField(max_length=255)
 
 	def __unicode__(self):
 		return unicode(self.description + '  ' + self.hpo_id)
+
+# Class: Match
+# Represents a match between two patients.
+class Match(models.Model):
+	#User set fields
+    # Patient1 should always have a lower patient ID than patient2 as a way
+    # to check and avoid duplicate entries
+	patient1 = models.ForeignKey(Patient, related_name='+')
+	patient2 = models.ForeignKey(Patient, related_name='+')
+	score12 = models.FloatField()
+	score21 = models.FloatField()
 
 # Class: PatientForm
 # Represents a ModelForm used to create an instance of a Patient
