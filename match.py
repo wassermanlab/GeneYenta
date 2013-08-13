@@ -1,170 +1,181 @@
 import math
+import argparse
 import MySQLdb
 
+# Maybe these should be passed in as command line arguments
+GY_DB_HOST = 'localhost'
+GY_DB_USER = 'gyadmin'
+GY_DB_PASS = 'gnytdmpw'
+GY_DB_NAME = 'GeneYenta'
+
 NO_MATCH = -1
-threshold = .75
-db=MySQLdb.connect(host="localhost",user="gyadmin",passwd="gnytdmpw",db="GeneYenta")
-cur = db.cursor()
-
-class Service:
-	def __init__(self):
-		self.cases = self.getCases()
-		self.matches = self.getMatches()
-
-	def getMatches(self):
-		matches = []
-		sql = "SELECT * FROM cases_match"
-		cur.execute(sql)
-		rows = cur.fetchall()
-		print rows
-		for row in rows:
-			matches.append(Match(row[1],row[2],row[3],row[4]))
-		return matches
-
-	def getCases(self):
-		cases = []
-		sql = "SELECT id FROM cases_patient"
-		cur.execute(sql)
-		rows= cur.fetchall()
-		for row in rows:
-			cases.append(Case(row[0]))
-		return cases
-
-	def matchAll(self):
-		for caseA in self.cases:
-			for caseB in self.cases:
-				if caseA.id >= caseB.id :
-					print "skipping match of " + str(caseA.id) + " and " + str(caseB.id)
-					continue 
-
-				ABScore = caseA.getMatchPercent(caseB)
-				BAScore = caseB.getMatchPercent(caseA)
-				newMatch = Match(caseA.id, caseB.id, ABScore, BAScore)
-
-				if self.alreadyMatched(caseA, caseB):
-					print "updating match of " + str(caseA.id) + " and " + str(caseB.id)
-					newMatch.updateDB()
-					continue
-
-				ABScore = caseA.getMatchPercent(caseB)
-				BAScore = caseB.getMatchPercent(caseA)
-				newMatch = Match(caseA.id, caseB.id, ABScore, BAScore)
-				self.matches.append(newMatch)
-				newMatch.writeToDB()
-				print "writing match of " + str(caseA.id) + " and " + str(caseB.id)
-		db.commit()
-
-	def alreadyMatched(self, caseA, caseB):
-		for match in self.matches:
-			if (match.caseAID == caseA.id and match.caseBID == caseB.id) or  (match.caseBID == caseA.id and match.caseAID == caseB.id):
-				return True
-		return False
 
 class Match:
-	def __init__(self, caseAID, caseBID, ABScore, BAScore):
-		self.caseAID = caseAID
-		self.caseBID = caseBID
-		self.ABScore = ABScore
-		self.BAScore = BAScore
+    def __init__(self, patient1_id, patient2_id, score12, score21):
+        self.patient1_id = patient1_id
+        self.patient2_id = patient2_id
+        self.score12 = score12
+        self.score21 = score21
 
-	def writeToDB(self):
-		sql = "INSERT INTO cases_match (patient1_id, patient2_id, score12, score21) VALUES (" +  str(self.caseAID) +", "+ str(self.caseBID) +", "+ str(self.ABScore) +", "+ str(self.BAScore) +  ")"
-		cur.execute(sql)
+class Patient:
+    def __init__(self, id):
+        self.id = id
+        self.terms = self.getTerms()
 
-	def updateDB(self):
-		sql = "update cases_match set score12 = " + str(self.ABScore) + ", score21 = " + str(self.BAScore) + " where patient1_id = " + str(self.caseAID) + " and patient2_id = " + str(self.caseBID) 
-		cur.execute(sql)
+    def getTerms(self, db):
+        terms = []
+        termSQL = "SELECT hpo_id, relevancy_score FROM cases_phenotype where patient_id = "+ str(self.id)
+        cur = db.cursor()
+        cur.execute(termSQL)
+        termRows= cur.fetchall()
+        for tRow in termRows:
+            term = PhenoTerm(tRow[0], tRow[1])
+            terms.append(term)
+        return terms
+        
+    def getMatchPercent(self, patient):
+        return self.matchSelectedTermsToPatient(patient.generateTermSet())
 
-class Case:
-	def __init__(self, id):
-		self.id = id
-		self.terms = self.getTerms()
+    def matchSelectedTermsToPatient(self, termList):
+        matchNumerator = 0
+        matchDenominator = 0
+        for selectedTerm in self.terms:
+            matchDenominator+= (selectedTerm.score * selectedTerm.weight)
+            bestScore = selectedTerm.findBestMatch(termList)
+            if bestScore == NO_MATCH:
+                bestScore = selectedTerm.matchAncestorsToPatient(termList)
+            matchNumerator += (bestScore * selectedTerm.weight)
+        return matchNumerator/matchDenominator
 
-	def getTerms(self):
-		terms = []
-		termSQL = "SELECT hpo_id, relevancy_score FROM cases_phenotype where patient_id = "+ str(self.id)
-		cur.execute(termSQL)
-		termRows= cur.fetchall()
-		for tRow in termRows:
-			term = PhenoTerm(tRow[0], tRow[1])
-			terms.append(term)
-		return terms
-		
-	def getMatchPercent(self, case):
-		return self.matchSelectedTermsToCase(case.generateTermSet())
-
-	def matchSelectedTermsToCase(self, termList):
-		matchNumerator = 0
-		matchDenominator = 0
-		for selectedTerm in self.terms:
-			matchDenominator+= (selectedTerm.score * selectedTerm.weight)
-			bestScore = selectedTerm.findBestMatch(termList)
-			if bestScore == NO_MATCH:
-				bestScore = selectedTerm.matchAncestorsToCase(termList)
-			matchNumerator += (bestScore * selectedTerm.weight)
-		return matchNumerator/matchDenominator
-
-	def generateTermSet(self):
-		allTerms = []
-		for term in self.terms:
-			if term not in allTerms:
-				allTerms.append(term)
-			for parent in term.getAllParents():
-				if parent not in allTerms:
-					allTerms.append(parent)
-		return allTerms
+    def generateTermSet(self):
+        allTerms = []
+        for term in self.terms:
+            if term not in allTerms:
+                allTerms.append(term)
+            for parent in term.getAllParents():
+                if parent not in allTerms:
+                    allTerms.append(parent)
+        return allTerms
 
 class PhenoTerm:
-	def __init__(self, id, weight):
-		self.id = id
-		self.score = self.getScore()
-		self.weight = weight
+    def __init__(self, id, weight):
+        self.id = id
+        self.score = self.getScore()
+        self.weight = weight
 
-	def getScore(self):
-		sql = "SELECT score FROM hpo_term where id = " + "\""+ self.id + "\""
-		cur.execute(sql)
-		row = cur.fetchone()
-		return row[0]
+    def getScore(self):
+        sql = "SELECT score FROM hpo_term where id = " + "\""+ self.id + "\""
+        cur.execute(sql)
+        row = cur.fetchone()
+        return row[0]
 
-	def getAllParents(self):
-		allParents = []
-		sql = "SELECT parent_id FROM hpo_lineage where id = " + "\""+ self.id + "\""
-		cur.execute(sql)
-		rows= cur.fetchall()
-		for row in rows:
-			allParents.append(PhenoTerm(row[0], self.score))
-		return allParents
+    def getAllParents(self):
+        allParents = []
+        sql = "SELECT parent_id FROM hpo_lineage where id = " + "\""+ self.id + "\""
+        cur.execute(sql)
+        rows= cur.fetchall()
+        for row in rows:
+            allParents.append(PhenoTerm(row[0], self.score))
+        return allParents
 
-	def findBestMatch(self, termList):
-		bestScore = NO_MATCH
-		for t in termList:
-			if t.id == self.id:
-				if self.score > bestScore:
-					bestScore = t.score
-		return bestScore
+    def findBestMatch(self, termList):
+        bestScore = NO_MATCH
+        for t in termList:
+            if t.id == self.id:
+                if self.score > bestScore:
+                    bestScore = t.score
+        return bestScore
 
-	def matchAncestorsToCase(self, termList):
-		bestScore = NO_MATCH
-		for parent in self.getAllParents():
-			matchScore =  parent.findBestMatch(termList)
-			if matchScore > bestScore:
-				bestScore = matchScore
-		return bestScore
+    def matchAncestorsToPatient(self, termList):
+        bestScore = NO_MATCH
+        for parent in self.getAllParents():
+            matchScore =  parent.findBestMatch(termList)
+            if matchScore > bestScore:
+                bestScore = matchScore
+        return bestScore
+
+class GYMatcher:
+    def __init()__:
+        db = MySQLdb.connect(
+            host    = GY_DB_HOST,
+            user    = GY_DB_USER,
+            passwd  = GY_DB_PASS,
+            db      = GY_DB_NAME
+        )
+
+        self.db = db
+
+    def getMatches(self):
+        matches = []
+        sql = "SELECT * FROM cases_match"
+        cur = self.db.cursor()
+        cur.execute(sql)
+        rows = cur.fetchall()
+        print rows
+        for row in rows:
+            matches.append(Match(row[1],row[2],row[3],row[4]))
+        return matches
+
+    def getPatients(self):
+        patients = []
+        sql = "SELECT id FROM cases_patient"
+        cur = self.db.cursor()
+        cur.execute(sql)
+        rows = cur.fetchall()
+        for row in rows:
+            patients.append(Patient(row[0]))
+        return patients
+
+    def DBInsertMatch(db, match):
+        sql = "INSERT INTO cases_match (patient1_id, patient2_id, score12, score21) VALUES (" +  str(match.patient1_id) +", "+ str(match.patient2_id) +", "+ str(match.score12) +", "+ str(match.score21) +  ")"
+        cur = db.cursor()
+        cur.execute(sql)
+
+    def DBUpdateMatch(db, match):
+        sql = "update cases_match set score12 = " + str(match.score12) + ", score21 = " + str(match.score21) + " where patient1_id = " + str(match.patient1_id) + " and patient2_id = " + str(match.patient2_id) 
+        cur = db.cursor()
+        cur.execute(sql)
+
+    def matchAll(self):
+        patients = getPatients()
+
+        for patient1 in patients:
+            for patient2 in patients:
+                if patient1.id >= patient2.id:
+                    print "skipping match of " + str(patient1.id) + " and " + str(patient2.id)
+                    continue 
+
+                score12 = patient1.getMatchPercent(patient2)
+                score21 = patient2.getMatchPercent(patient1)
+                newMatch = Match(patient1.id, patient2.id, score12, score21)
+
+                if self.alreadyMatched(patient1, patient2):
+                    print "updating match of " + str(patient1.id) + " and " + str(patient2.id)
+                    DBUpdateMatch(db, newMatch)
+                else
+                    print "writing match of " + str(patient1.id) + " and " + str(patient2.id)
+                    DBInsertMatch(db, newMatch)
+        #db.commit()
+
+    def alreadyMatched(self, patient1, patient2):
+        for match in self.matches:
+            if (match.patient1_id == patient1.id and match.patient2_id == patient2.id) or  (match.patient2_id == patient1.id and match.patient1_id == patient2.id):
+                return True
+        return False
 
 def main():
-	s = Service()
-	print "Case info"
-	for c in s.cases:
-		print c.id
-		for t in c.terms:
-			print t.id
-	print ""
-	print "trying to match"
-	s.matchAll()
-	print ""
-	print "All matched pairs:"
-	for m in s.matches:
-		print str(m.caseAID) +" " + str(m.caseBID) + " 12Score = " + str(m.ABScore) + " 21Score = "+str(m.BAScore)
+    parser = argparse.ArgumentParser(
+        description = 'Match patient phenotypes in the GeneYenta DB. If a patient ID is provided, match that patient to all other patients, otherwise match all patients to all other patients.'
+    )
+
+    parser.add_argument('-id', '--patient_id', nargs='?', const=0, default=0)
+    args = parser.parse_args()
+    patient_id = args.patient_id
+
+    if patient_id:
+        matchPatient(db, patient_id)
+    else:
+        matchAll(db)
 
 if __name__ == "__main__":
-	main()
+    main()
