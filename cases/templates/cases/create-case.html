@@ -2,112 +2,226 @@
 
 {% block title %}GeneYenta Create Case{% endblock %}
 
-{% block header %} Create a new case {% endblock %}
-
+{% block header %}Create a new case{% endblock %}
 
 {% block content %}
 
 
+<div class="row">
+<div class="col-lg-11 col-offset-1 col-12">
+    <h4>General Information</h4>
+    <div class="row">
+        <div class="col-lg-8 col-12">
+        <p>Please fill in these forms to provide basic information about your patient. Please note that the "Private Identifier" will not be shared with any other user, but all other information will be visible to medical professionals with cases that match your own.</p>
+        </div>
+    </div>
+        <form name='patient-form' id="form" method="POST">
+        	 	{% csrf_token %}
+        	 	{{patientform.json}}
 
-{% ssi '/Users/etadministrator/Sites/django_sites/geneyenta_mk3/cases/static/cases/dynatree/dev/FullTree.html' parsed %}
+            <div class="row">
+                <div class="col-lg-6 col-12">
+                    <dl class="">
+                        <dt> Private Identifier</br>
+                            <small>This is a confidential identifier used to reference a patient's medical records (e.g. a chart number or medical file number). It is for your personal organization only. 
+                            </small>
+                        </dt>
+                        <dd>{{patientform.private_id}}</dd>
+                        <dt>Case Summary</br>
+                            <small>Please provide a detailed set of clinical observations and any other details that you find relevant in describing this case.
+                            </small> 
+                        </dt>
+                        <dd>{{patientform.case_summary}}</dd>
+                    </dl>
+                </div>
+
+                <div class="col-lg-6 col-12">
+                    <dl class="">
+                        <dt>Institute</br>
+                            <small>
+                                The institute that the patient is associated with.
+                            </small>
+                        </dt>
+                        <dd>{{patientform.institute}}</dd>
+                        <dt>Clinic</br>
+                            <small> 
+                                The clinic where the patient's records are stored. 
+                            </small>
+                        </dt>
+                        <dd>{{patientform.clinic}}</dd>
+                    </br>    
+                        <dt>Month and Year of Patient's First Appointment</dt>
+                        <dd>{{patientform.first_appointment_month}}{{patientform.first_appointment_year}}</dd>
+                    </br>
+                        <dt> Patient's Age at First Appointment </dt>
+                        <dd>{{patientform.first_appointment_age}}</dd>
+                    </br>
+                        <dt>Patient's Gender</dt>
+                            <dd>{{patientform.gender}}</dd>
+                    </dl>
+                </div>
+            
+            </div>
+           
+    <h4> Phenotype Information </h4>
+{% ssi '/apps/GeneYenta/static/cases/dynatree/dev/hpo-tree.html' parsed %}
+
+</div>
+</div>
+
+<!-- alerts -->
+<div class="row">
+
+<div class="col-lg-5 col-offset-1 col-12">
+    <div id="general-fields-missing-warning" class="alert" style="display:none;">
+        <h4>General Information Form Errors</h4>
+        <p id="general-fields-missing-text"></p>
+    </div>
+</div>
+
+<div class="col-lg-5 col-12">
+    <div id="phenotype-fields-missing-warning" class="alert" style="display:none;">
+        <h4>Phenotype Information Form Errors</h4>
+        <p id="phenotype-fields-missing-text"></p>
+    </div>
+</div> 
 
 
+</div>
+<!-- /alerts -->
 
-<form name='patient-form' id="form" method="POST">
-	 	{% csrf_token %}
-	 	<div id='json'>{{patientform.json}}</div>
-        {{patientform.as_p}}
-
-        <input type="submit" value="Submit"/>
+<div class="row">
+    <div id="create-case-submit" class="col-lg-12 col-12">
+        <input class="btn btn-default btn-large" type="submit" value="Submit this case"/>
+    </div>
 </form>
+        
 
 
 <script type="text/javascript">
 
-$('#form').submit(function(evt) {
-	var terms = new Array();
-	$( ".selected" ).each(function( index ) {
- 		var single_term = new Object();
- 		
- 		//captures the hpo id 
- 		var id = $(this).attr('id');
- 		single_term.hpo_id = id;
+    function htmlForTextWithEmbeddedNewlines(text) {
+                var htmls = [];
+                var lines = text.split(/\n/);
+                var tmpDiv = jQuery(document.createElement('div'));
+                for (var i = 0 ; i < lines.length ; i++) {
+                    htmls.push(tmpDiv.text(lines[i]).html());
+                }
+                return htmls.join("<br>");
+            }
 
- 		//captures the title info
- 		single_term.description = $(this).attr('title');
 
- 		//captures the relevancy rating
- 		var radio = $(this).find('input:radio[name=importance'+id+']:checked');
+    $('#form').submit(function(evt) {
+        
+        var fail_validation = false;
+        var phenotype_errors ='You have not selected an importance rating for:\n';
+    	var terms = new Array();
+    	
+        $( ".selected" ).each(function( index ) {
+     		var single_term = new Object();
+     		
+     		//captures the hpo id 
+     		var id = $(this).attr('id');
+     		single_term.hpo_id = id;
 
-        //if radio.length == 0; the radio button hasn't been checked 
-        if (radio.length > 0) { 	 	
-            single_term.importance = radio.val();
-            terms.push(single_term);//adds its to the array
+     		//captures the title info
+     		single_term.description = $(this).attr('title');
+
+     		//captures the relevancy rating
+     		var radio = $(this).find('input:radio[name=importance'+id+']:checked');
+
+            if (radio.length > 0) { 	 	
+                single_term.importance = radio.val();
+                terms.push(single_term);//adds its to the array
+            } else {
+                //alert('You have not selected an importance rating for: \"'+single_term.description+'\".');
+                phenotype_errors += single_term.description +'\n';
+                fail_validation = true;
+                evt.preventDefault();
+            }
+        });  
+
+        if (fail_validation) {
+            $("#phenotype-fields-missing-text").html(htmlForTextWithEmbeddedNewlines(phenotype_errors));
+            $("#phenotype-fields-missing-warning").show();
         } else {
-            alert('You have not selected an importance rating for \"'+single_term.description+'\".');
-            evt.preventDefault();
+        	var result = JSON.stringify(terms);
+        	//alert(result);
+        	$('#id_patient-json').val(result);//sets the value of the hidden element to the json-string
+        	//alert($('#id_patient-json').val());
         }
-	});  
-	var result = JSON.stringify(terms);
-	//alert(result);
-	$('#id_patient-json').val(result);//sets the value of the hidden element to the json-string
-	//alert($('#id_patient-json').val());
-});
- </script>
+
+    });
+</script>
 
 {% endblock %}
 
+
+
 {% block endbody %}
-
-
-<script src="{{ STATIC_URL }}cases/validate.js" type="text/javascript"></script>
+<script src="{{ STATIC_URL }}cases/js/validate.js" type="text/javascript"></script>
 <script type="text/javascript">
-var validator = new FormValidator('patient-form', [{
-    name: 'patient-case_summary',
-    display: '\"Case summary\"',    
-    rules: 'required'
-}, {
-    name: 'patient-institute',
-    display: '\"Institute\"',  
-    rules: 'required'
-}, {
-    name: 'patient-clinic',
-    display: '\"Clinic\"',
-    rules: 'required',
-}, {
-    name: 'patient-gender',
-    display: '\"Gender\"',
-    rules: 'required',
-}, {
-    name: 'patient-first_appointment_date_month', //should be made optional...in models.py
-    display: '\"First appointment month field\"',
-    rules: 'required',
-}, {
-	name: 'patient-first_appointment_date_day',
-    display: '\"First appointment day field\"',
-	rules: 'required'
-}, {  
-	name: 'patient-first_appointment_date_year',
-    display: '\"First appointment year field\"',
-	rules: 'required',
-}, {
-	name: 'patient-first_appointment_age',
-    display: '\"First appointment age field\"',
-	rules: 'required',
-}], function(errors, event) {
-    if (errors.length > 0) {
-       var errorString = '';  
-        for (var i = 0, errorLength = errors.length; i < errorLength; i++) {
-            errorString += errors[i].message + '\n';
-        }    
-        alert('You have left some fields empty!\nPlease remedy these errors before submitting:\n'+errorString);
-    	//return false;
-    }       
-    }
-
-);
+    //validate.js code for 'general information' validation
+    var validator = new FormValidator('form', [{
+        name: 'patient-private_id',
+        display: '\"Private Identifier\"',
+        rules: 'required',
+    }, {
+        name: 'patient-case_summary',
+        display: '\"Case summary\"',    
+        rules: 'required'
+    }, {
+        name: 'patient-institute',
+        display: '\"Institute\"',  
+        rules: 'required',
+    }, {
+        name: 'patient-clinic',
+        display: '\"Clinic\"',
+        rules: 'required',
+    }, {
+        name: 'patient-first_appointment_month', //should be made optional...in models.py
+        display: '\"First appointment month field\"',
+        rules: 'required',
+    }, {  
+    	name: 'patient-first_appointment_year',
+        display: '\"First appointment year field\"',
+    	rules: 'required|is_natural_no_zero',
+    }, {
+    	name: 'patient-first_appointment_age',
+        display: '\"First appointment age field\"',
+    	rules: 'required|is_natural',
+    }, {
+        name: 'patient-gender',
+        display: '\"Gender\"',
+        rules: 'required',
+    }], function(errors, event) {
+        if (errors.length > 0) {
 
 
+            //http://stackoverflow.com/questions/4535888/jquery-text-and-newlines
+            // http://stackoverflow.com/questions/268490/
+            function htmlForTextWithEmbeddedNewlines(text) {
+                var htmls = [];
+                var lines = text.split(/\n/);
+                var tmpDiv = jQuery(document.createElement('div'));
+                for (var i = 0 ; i < lines.length ; i++) {
+                    htmls.push(tmpDiv.text(lines[i]).html());
+                }
+                return htmls.join("<br>");
+            }
+           
+           var errorString = 'Please remedy these errors before submitting:\n';  
+            for (var i = 0, errorLength = errors.length; i < errorLength; i++) {
+                errorString += errors[i].message + '  \n';
+            }    
+            
+            $("#general-fields-missing-text").html(htmlForTextWithEmbeddedNewlines(errorString));
+            $("#general-fields-missing-warning").show();
+
+        	//return false;
+        }       
+        }
+
+    );
 </script>
- 
 {% endblock %}

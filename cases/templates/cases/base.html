@@ -1,34 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <title>{% block title %}{% endblock %}</title>
+  <title>{% block title %}{% endblock %}</title>
+  <!-- Bootstrap includes -->
+  <link href="{{STATIC_URL}}cases/css/bootstrap.min.css" rel="stylesheet" media="screen">
+  <link href="{{STATIC_URL}}cases/css/custom.css" rel="stylesheet" media="screen">
+
 </head>
-<span>{% url 'django.contrib.auth.views.logout' as logout %}
-    <a href="{{logout}}"> Click here to logout </a> </span>
-<h1> {%	block header %} {% endblock %} </h1>
+
 <body>
-    <div id="sidebar">
-        {% block sidebar %}
-        <ul>
-            {% url 'cases.views.inbox' as inbox %}
-            {% url 'cases.views.view_cases' as cases %}
-            {% url 'cases.views.matches' as matches %}
-            {% url 'cases.views.settings' as settings %}
+<div class="row">
+  <div class=" col-lg-4 col-offset-1">
+    <h1>GeneYenta</h1>
+   </div>
+</div>
+
+<!-- navbar urls -->
+{% url 'cases.views.view_matches' as matches %}
+{% url 'cases.views.view_cases' as cases %}
+{% url 'cases.views.archives' as archives %}
+{% url 'cases.views.settings' as settings %}
+{% url 'django.contrib.auth.views.logout' as logout %}   
+<!-- /navbar urls -->
 
 
-            <li><a href="{{inbox}}">Inbox</a></li>
-            <li><a href="{{cases}}">Cases</a></li>
-            <li><a href="{{matches}}">Matches</a></li>
-            <li><a href="{{settings}}">Settings</a></li>
-        </ul>
-        {% endblock %}
+{% block sidebar %}   
+<!-- top-navigation -->    
+<div class="row">
+<div id="top-navigation">
+    <div class="navbar">  
+        <div class="container">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+        <a id="top-navigation-brand" href="#" class="navbar-brand">
+                    {% block header %} {% endblock %}
+        </a>      
+           
+            <div class="nav-collapse collapse navbar-responsive-collapse">
+                <ul class="nav navbar-nav">
+                    <li><a href="{{matches}}">Matches</a></li>
+                    <li><a href="{{cases}}">Cases</a></li>
+                    <li><a href="{{archives}}">Archives</a></li>
+                    <li><a href="{{settings}}">Settings</a></li>
+                    
+                    <li>
+                        <p class="navbar-text" style="margin-left:30px;"> Signed in as {{user.username}}</p>
+                    </li>
+                    <li><a class="btn btn-warning" href="{{logout}}" style="margin-left:30px">Logout</a></li>
+                </ul>
+            </div>          
+        </div>  
     </div>
+</div> <!-- /#top-navigation -->
+</div>   
+ 
+{% endblock %}
+    
 
-    <div id="content">
-        {% block content %}{% endblock %}
+<div class="row">
+    <div class="col-offset-1 col-lg-10 col-sm-10 col-12">
+        {% if messages %} 
+            {% for message in messages %} 
+            <div id='messages' class="{{message.tags}}">
+              <p>{{message}}</p> 
+            </div>
+            {% endfor %} 
+        {% endif %} 
     </div>
+</div>
 
-     {% block endbody %}{% endblock %}
+<!-- this is breaking the dynatree if it is included anywhere else
+must be fixed... 
+ -->
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+{% block content %}
+{% endblock %}
+
+
+{% block endbody %}
+{% endblock %}
+
+
+<script src="{{STATIC_URL}}cases/js/bootstrap.min.js"></script>
+
+
 </body>
 </html>

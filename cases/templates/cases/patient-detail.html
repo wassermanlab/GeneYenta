@@ -5,30 +5,74 @@
 {% block header %} Patient Detail {% endblock %}
 
 {% block content %}
+<div class="row">
+<div class="col-lg-10 col-offset-1 col-12">
 
-<h2> Patient System ID: {{patient.id}} </h2>
-<h5> Clinic: {{patient.clinic}} </h5>
-<h5> Institute: {{patient.institute}} </h5>
-<h4> Case Summary </h4>
-<p> {{patient.case_summary}} </p>
+<div class="row">
+	<div class="col-lg-4 col-12">	
+			<h4>General Info</h4>
+			<dl class="dl-horizontal">
+			<dt> Case System ID:</dt>
+			<dd> {{patient.id}}</dd>
+			<dt> Private ID: </dt>
+			<dd> {{patient.private_id}}</dd>
+			<dt>Clinic:</dt>
+			<dd>{{patient.clinic}}</dd>
+			<dt>Institute:</dt>
+			<dd>{{patient.institute}}</dd>
+			<dt>First Appt. Date:</dt>
+			<dd>{{patient.first_appointment_month}}, {{patient.first_appointment_year}}</dd>
+			<dt>First Appt. Age:</dt>
+			<dd>{{patient.first_appointment_age}}</dd>
+			<dt>Date Added:</dt>
+			<dd>{{patient.date_added}}</dd>
+			<dt>Last Modified:</dt>
+			<dd>{{patient.last_modified}}</dd>
+			</dl>
+	</div>
+	<div class="col-lg-8 col-12">
+		<h4>Case Summary</h4>
+		<p class="summary"> {{patient.case_summary}} </p>
+	</div>
+</div>
 
-<a href="{% url 'cases.views.patient_edit' patient.id %}"> Edit this patient </a>
+<div class="row">
+	<div class="col-lg-12 col-12">
+			<h4>Phenotypes</h4>
+			{% if phenotypes %}
+			<table class="table table-bordered table-condensed">
+				<thead>
+                	<tr>
+                  		<th>Phenotype</th>
+                  		<th>Your Importance Rating (1-5)</th>
+                		<th>Date Added</th>
+            	 	</tr>
+          		</thead>
+          		{% for p in phenotypes %}
+					<tr>
+						<td>{{p.description}}</td>
+						<td>{{p.relevancy_score}}</td>
+						<td>{{p.date_added}}</td>
+					</tr>
+				{% endfor %}
 
-<ul>
-{% if phenotypes %}
-<h5>Phenotypes</h5>
 
-{% for p in phenotypes %}
-	<li>{{p.description}}</li>
-{% endfor %}
-</ul>
+			</table>
+		{% else %}
+			<p> You haven't associated any phenotypes with this case. </p>
+		{% endif %}
+	</div>
+</div>
 
-{% else %}
-
-<h5> You haven't associated any phenotypes for this case </h5>
-
-{% endif %}
+</div>
+</div>
 
 
-
+<div class="row">
+	<div class="col-lg-4 col-offset-4 col-12">
+		<a class="btn btn-info" href="{% url 'cases.views.patient_edit' patient.id %}"> Edit this patient </a>
+		<a class="btn btn-danger" href="#">Archive case</a>
+	</div>
+</div>
+		
 {% endblock %}

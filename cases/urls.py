@@ -7,8 +7,8 @@ from cases import views
 
 urlpatterns = patterns('',
     
-    # ex: inbox/
-    url(r'^inbox/$', views.inbox, name='inbox'),
+    # ex: view_matches/
+    url(r'^view-matches/$', views.view_matches, name='view_matches'),
 
     # ex: create-case/
     url(r'^create-case/$', views.create_case, name='create_case'),
@@ -33,6 +33,17 @@ urlpatterns = patterns('',
 
     # ex: 12/profile-detail/
     url(r'^(?P<clinician_id>\d+)/profile-edit/$', views.profile_edit, name='profile_edit'),
+
+    # ex: 12/match-detail/
+    url(r'^(?P<match_id>\d+)/match-detail/$', views.match_detail, name='match_detail'),
+
+    url(r'^archives/$', views.archives, name='archives'),
+
+    url(r'^change-password/$', 'django.contrib.auth.views.password_change', {'template_name':'cases/change-password.html',
+    }, name='change_password'),
+
+    url(r'^change-password/change-success/$', 'django.contrib.auth.views.password_change_done', {'template_name': 'cases/change-password-success.html'},
+     name='change_password_success'),
 
 )
 

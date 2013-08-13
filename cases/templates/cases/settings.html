@@ -2,11 +2,29 @@
 
 {% block title %}GeneYenta Settings{% endblock %}
 
-{% block header %} {{profile.name}}'s Settings{% endblock %}
+{% block header %}Your Settings{% endblock %}
 
 
 {% block content %}
-<h1> A settings form, probably </h1>
-<a href="{% url 'cases.views.profile_edit' user.clinician.id %}">Edit your user profile</a>
+<div class="row">
+<div class="col-lg-11 col-offset-1 col-12"> 
+	<h4>Settings Directory</h4>
+	<p>
+		Please choose from the list of options below:
+	</p>
+	<ul>
+		<li>
+			<a href="{% url 'cases.views.profile_edit' user.clinician.id %}">
+				Edit your contact information
+			</a>
+		</li>
+		<li>
+			<a href="{% url 'change_password' %}">
+				Change your password
+			</a>
+		</li>
+	</ul>
 
+</div>
+</div>
 {% endblock %}

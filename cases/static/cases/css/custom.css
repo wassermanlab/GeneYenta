@@ -1,0 +1,91 @@
+p.summary{
+	overflow: auto;
+	max-height: 352px;
+	margin-right: 50px;
+}
+
+p.research-focus-detail {
+	overflow:auto;
+	max-height:200px;
+	margin-right: 20px;
+	word-break:break-all;
+
+}
+
+#options{
+	display: block;
+	margin-right: auto;
+	margin-left: auto;	
+}
+
+#navbar-name-brand{
+	max-width: 350px;
+}
+
+#info-row{
+	max-height: 200px;
+
+}
+
+/* Importance Selectors */
+
+input.radioButton{
+margin-right: 20px;
+/*display: inline;*/
+/*float: right;*/
+
+}
+
+div.selectedTermText {
+	/*float: left;*/
+	/*display: inline-block;*/
+
+}
+
+#selectedTerms {
+	overflow: auto;
+	max-height: 400px;
+
+}
+
+div.importance_radios {
+	/*float:left;*/
+}
+
+/*#searchButton {
+	float: right;
+}*/
+
+/*#alerts-warning {
+	display: none;
+}*/
+
+div#results {
+	overflow: auto;
+	max-height: 100px;
+	border: 2px solid #b6fcd5;
+	margin-bottom: 10px;
+	margin-top: 4px;
+}
+
+#tree{
+	overflow: auto;
+	max-height: 300px;
+	margin-bottom: 20px;
+	border: 1px solid #dcdcdc;
+}
+
+#create-case-submit {
+	text-align: center;
+	margin-bottom: 20px;
+}
+
+#warning{
+
+	text-align: center;
+}
+
+#phenotype-fields-missing-warning {
+	max-height: 241px;
+	overflow: auto;
+}

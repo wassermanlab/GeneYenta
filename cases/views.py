@@ -11,24 +11,37 @@ from django.db import models
 
 from django.contrib.auth.models import User
 from registration.models import Clinician, ClinicianForm
-from cases.models import Patient, Phenotype, PatientForm
+from cases.models import Patient, Phenotype, PatientForm, Match
 # from django.contrib.auth import authenticate, login
 
 import json
-
+from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 # from django.core.mail import send_mail
 # from geneyenta.settings import EMAIL_HOST_USER
 #from django.contrib.auth.decorators import user_passes_test
 from helper import forbidden_request, LOGIN_REQUIRED_URL
+from django.contrib import messages
+
+
+MATCH_THRESHOLD = 0.7
+
+EDIT = True
+CREATE = False
 
 
 #### HELPER FUNCTION ######
-def process_phenotypes(request, patient, getlist_key):
+def process_phenotypes(request, patient, getlist_key, flag):
 	# Phenotype object processing
 	json_str = str(request.POST.getlist(getlist_key)) #gets json as string
+	print json_str
 	processed = json_str.replace("[u\'","",1) #removes unecessary prefix [u'
-	processed = processed.replace("\', u\'\']","",1) #removes uncessary suffix ',u'']
+	print processed
+	if flag is EDIT:
+		processed = processed.replace("\', u\'\']","",1) #removes uncessary suffix ',u'']
+	else:
+		processed = processed.replace("\']","",1) #removes uncessary suffix ',u'']
+	print processed
 	# only after processing will it be successfully converted to an array of dictionaries
 	json_data = json.loads(processed)
 	for term in json_data: #iterates through array
@@ -48,16 +61,86 @@ def process_phenotypes(request, patient, getlist_key):
 # View: [title]
 # [interface description]
 
+
+
 # View: inbox
 # Match notification dashboard for authenticated users
 @login_required(login_url=LOGIN_REQUIRED_URL)
-def inbox(request):
+def view_matches(request):
 	user = request.user
 	if user.is_authenticated() and user.is_active:
-		profile = user.clinician		
+		profile = user.clinician
+		# make 2 separate query sets and pass them as appropriate
+
+		#TODO: add a check for is_archived
+		#TODO: MATCH_THRESHOLD -- score12 and score21 should be actually a mutual score
+		
+		users_matches_p1 = Match.objects.filter(
+			(Q(patient1__clinician=profile)&Q(score12__gte=MATCH_THRESHOLD))
+		)
+		users_matches_p2 = Match.objects.filter(
+			(Q(patient2__clinician=profile)&Q(score21__gte=MATCH_THRESHOLD))
+		)
+
 		context = {'user': user,
-		 			'profile': profile,}
-		return render(request, 'cases/inbox.html', context)
+		 			'profile': profile,
+		 			'matches_p1': users_matches_p1,
+		 			'matches_p2': users_matches_p2,}
+		return render(request, 'cases/view-matches.html', context)
+
+class Term:
+	def __init__(self, rating1, rating2, name):
+		self.name = name
+		self.user_rating = rating1
+		self.other_rating = rating2
+		self.html_class = "danger"
+
+def organizePatients(user_patient, other_patient, user, profile):
+		other_user = other_patient.clinician
+		user_phenotypes = Phenotype.objects.filter(patient=user_patient)	
+		other_phenotypes = Phenotype.objects.filter(patient=other_patient)
+		phenotype_dict = dict()
+		for p in list(user_phenotypes):
+			phenotype_dict[p.description] = Term(p.relevancy_score, "N/A", p.description)
+		for p in list(other_phenotypes):
+			if p.description not in phenotype_dict:
+				phenotype_dict[p.description] = Term("N/A", p.relevancy_score, p.description)
+			else:
+				t = phenotype_dict[p.description]
+				t.other_rating = p.relevancy_score
+				if t.other_rating == t.user_rating:
+					t.html_class = "success"
+				else:
+					t.html_class = "warning"
+		
+		phenotypes = list()
+		for k in phenotype_dict:
+			phenotypes.append(phenotype_dict[k])		
+
+		context = {'user_patient': user_patient,
+					#'user_phenotypes': user_phenotypes,
+					'other_patient': other_patient,
+					#'other_phenotypes': other_phenotypes,
+					'user': user,
+					'profile': profile,
+					'other_user': other_user,
+					'phenotypes': phenotypes,
+					}
+		return context
+
+@login_required(login_url=LOGIN_REQUIRED_URL)
+def match_detail(request, match_id):
+	user = request.user
+	match = Match.objects.get(pk=match_id)
+	if match.patient1.clinician.id == user.clinician.id:
+		context = organizePatients(match.patient1, match.patient2, user, user.clinician)
+		return render(request, 'cases/match-detail.html', context)
+	elif match.patient2.clinician.id == user.clinician.id:
+		context = organizePatients(match.patient2, match.patient1, user, user.clinician)
+ 		return render(request, 'cases/match-detail.html', context)
+	else:
+		return forbidden_request(request)
+
 
 # View: view_cases
 # List of all cases associated with given clinician profile
@@ -103,9 +186,9 @@ def settings(request):
 def create_case(request):
 	if request.method == 'POST':
 		# Creates a 'bound' PatientForm instance
+		print 'post called'
 		patient_form = PatientForm(request.POST, prefix='patient')
 		if patient_form.is_valid():
-			
 			# Patient object processing
 			patient = patient_form.save(commit=False)
 			user_patient = request.user.clinician
@@ -113,8 +196,8 @@ def create_case(request):
 			patient.save() #commits the patient object to the database
 
 			# Phenotype object processing
-			process_phenotypes(request, patient, 'patient-json')
-
+			process_phenotypes(request, patient, 'patient-json', CREATE)
+			messages.success(request, "Case created successfully!", extra_tags='alert alert-success')
 			return HttpResponseRedirect('') #redirects to unbound form for another submission
 	else:
 		patient_form = PatientForm(prefix='patient')
@@ -154,9 +237,10 @@ def patient_edit(request, patient_id):
 			form = PatientForm(request.POST, instance=patient)
 			if form.is_valid():	
 				phenotypes.delete()
-				process_phenotypes(request, patient, 'json') #saves newly-selected phenotypes
+				process_phenotypes(request, patient, 'json', EDIT) #saves newly-selected phenotypes
 				form.save()
-				return HttpResponseRedirect('')
+				messages.success(request, "Your changes were successful!", extra_tags='alert alert-success')
+				return HttpResponseRedirect('/')
 			else:
 				print 'patient_edit: form save failure'		
 		else:
@@ -179,8 +263,10 @@ def profile_edit(request, clinician_id):
 			form = ClinicianForm(request.POST, instance=clinician)
 			if form.is_valid():
 				form.save()
+				messages.success(request, "User profile details updated successfully!", extra_tags='alert alert-success')
 				return HttpResponseRedirect('') #redirects to unbound form
 			else:
+				messages.success(request, "There was an error saving your changes, please try again.", extra_tags='alert alert-error')
 				print 'profile_edit: failure to save form'		
 		else:
 			form = ClinicianForm(instance=clinician)
@@ -191,6 +277,9 @@ def profile_edit(request, clinician_id):
 		return forbidden_request(request)
 
 
+@login_required(login_url=LOGIN_REQUIRED_URL)
+def archives(request):
+	return HttpResponse('yay')
 
 
 
