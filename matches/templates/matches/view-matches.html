@@ -26,7 +26,7 @@
           	</thead>
 			{% for m in matches_p1 %}
 				<tr>
-					<td><a class="btn btn-info" href="{% url 'cases.views.match_detail' m.id %}">More info</a></td>
+					<td><a class="btn btn-info" href="{% url 'matches.views.match_detail' m.id %}">More info</a></td>
 					<td>{{m.patient1.id}}</td>
 					<td>{{m.patient1.private_id}}</td>
 					<td>NOT MUTUAL: {{m.score12}}</td>
@@ -35,7 +35,7 @@
 			{% endfor %}
 			{% for m in matches_p2 %}
 				<tr>
-					<td><a class="btn btn-info" href="{% url 'cases.views.match_detail' m.id %}">More info</a></td>
+					<td><a class="btn btn-info" href="{% url 'matches.views.match_detail' m.id %}">More info</a></td>
 					<td>{{m.patient2.id}}</td>
 					<td>{{m.patient2.private_id}}</td>			
 					<td>NOT MUTUAL: {{m.score21}}</td>

@@ -140,6 +140,7 @@ INSTALLED_APPS = (
     'cases',
     'djcelery',
     'kombu.transport.django',
+    'matches',
 )
 
 # A sample logging configuration. The only tangible logging
@@ -181,4 +182,5 @@ EMAIL_HOST_USER = 'root@geneyenta.cmmt.ubc.ca'
 
 ALLOWED_INCLUDE_ROOTS = (
     '/apps/GeneYenta/static/cases/dynatree/dev/',
+    '/apps/GeneYenta/matches/templates/matches/',
 )
