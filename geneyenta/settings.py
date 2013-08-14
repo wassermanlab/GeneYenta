@@ -7,10 +7,10 @@
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-STATIC_ROOT = "/apps/geneyenta/static"
-MEDIA_ROOT = "/apps/geneyenta/media"
-STATIC_URL = "/static/"
-MEDIA_URL = "/media/"
+######### For chron jobs i.e. matching ###
+import djcelery
+djcelery.setup_loader()
+BROKER_URL = 'django://'
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
@@ -59,18 +59,18 @@ USE_TZ = True
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/var/www/example.com/media/"
-MEDIA_ROOT = ''
+MEDIA_ROOT = "/apps/GeneYenta/media"
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
 # Examples: "http://example.com/media/", "http://media.example.com/"
-MEDIA_URL = ''
+MEDIA_URL = "/media/"
 
 # Absolute path to the directory static files should be collected to.
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/var/www/example.com/static/"
-STATIC_ROOT = ''
+STATIC_ROOT = "/apps/GeneYenta/static"
 
 # URL prefix for static files.
 # Example: "http://example.com/static/", "http://static.example.com/"
@@ -136,8 +136,10 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'registration',
-    #'django_extensions',
+    'django_extensions',
     'cases',
+    'djcelery',
+    'kombu.transport.django',
 )
 
 # A sample logging configuration. The only tangible logging
@@ -177,6 +179,8 @@ EMAIL_HOST_USER = 'root@geneyenta.cmmt.ubc.ca'
 #EMAIL_HOST_PASSWORD = ''
 #EMAIL_USE_TLS = False
 
-ALLOWED_INCLUDE_ROOTS = ( '/Users/etadministrator/Sites/django_sites/geneyenta_mk3/cases/static/',
-    '/Users/etadministrator/Sites/django_sites/geneyenta_mk3/cases/templates/dynatreereduced/dev/FullTree.html',
-    '/Users/etadministrator/Sites/django_sites/geneyenta_mk3/cases/static/cases/dynatree/dev/hpo.json' )
+ALLOWED_INCLUDE_ROOTS = (
+    '/apps/GeneYenta/geneyenta/cases/static/',
+    '/apps/GeneYenta/geneyenta/cases/templates/dynatreereduced/dev/FullTree.html',
+    '/apps/GeneYenta/geneyenta/cases/static/cases/dynatree/dev/hpo.json'
+)

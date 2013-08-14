@@ -25,7 +25,7 @@ from helper import LOGIN_REQUIRED_URL
 # If not, the user is redirected to the login page.
 def home_redirect(request):
 	if request.user.is_authenticated():
-		return HttpResponseRedirect('cases/inbox')
+		return HttpResponseRedirect('cases/view-matches')
 	else:
 		return HttpResponseRedirect('accounts/login')
 
