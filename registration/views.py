@@ -3,6 +3,7 @@
 from django.shortcuts import render, get_object_or_404
 
 from django.http import HttpResponseRedirect
+from django.core.urlresolvers import reverse
 
 from django.contrib.auth.models import User
 from registration.models import Clinician, ClinicianForm, UserForm
@@ -25,7 +26,7 @@ from helper import LOGIN_REQUIRED_URL
 # If not, the user is redirected to the login page.
 def home_redirect(request):
 	if request.user.is_authenticated():
-		return HttpResponseRedirect('cases/view-matches')
+		return HttpResponseRedirect('matches/view-matches')
 	else:
 		return HttpResponseRedirect('accounts/login')
 
@@ -67,16 +68,13 @@ def registration_success(request):
 # Basic placeholder screen to indicate login success
 @login_required(login_url=LOGIN_REQUIRED_URL)
 def login_success(request):
-	user = request.user
-	valid = str(user.is_active)
-	context = {'name': user.username,
-				'valid': valid,
-				'profile': user.clinician,}
-	return render(request, 'registration/login-success.html', context)
+	return HttpResponseRedirect(reverse('view_matches'))
 
 # View: change_succsess
 # Indicates that the user has successfully changed the password of the account
 @login_required(login_url=LOGIN_REQUIRED_URL)
 def change_success(request):
 	return render(request, 'registration/change-success.html', )
-	
+
+def logout_redirect(request):
+	return HttpResponseRedirect(reverse('home'))

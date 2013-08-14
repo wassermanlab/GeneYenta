@@ -11,7 +11,8 @@ from django.db import models
 
 from django.contrib.auth.models import User
 from registration.models import Clinician, ClinicianForm
-from cases.models import Patient, Phenotype, PatientForm, Match
+from cases.models import Patient, Phenotype, PatientForm
+from matches.models import Match
 # from django.contrib.auth import authenticate, login
 
 import json
@@ -63,83 +64,83 @@ def process_phenotypes(request, patient, getlist_key, flag):
 
 
 
-# View: inbox
-# Match notification dashboard for authenticated users
-@login_required(login_url=LOGIN_REQUIRED_URL)
-def view_matches(request):
-	user = request.user
-	if user.is_authenticated() and user.is_active:
-		profile = user.clinician
-		# make 2 separate query sets and pass them as appropriate
+# # View: inbox
+# # Match notification dashboard for authenticated users
+# @login_required(login_url=LOGIN_REQUIRED_URL)
+# def view_matches(request):
+# 	user = request.user
+# 	if user.is_authenticated() and user.is_active:
+# 		profile = user.clinician
+# 		# make 2 separate query sets and pass them as appropriate
 
-		#TODO: add a check for is_archived
-		#TODO: MATCH_THRESHOLD -- score12 and score21 should be actually a mutual score
+# 		#TODO: add a check for is_archived
+# 		#TODO: MATCH_THRESHOLD -- score12 and score21 should be actually a mutual score
 		
-		users_matches_p1 = Match.objects.filter(
-			(Q(patient1__clinician=profile)&Q(score12__gte=MATCH_THRESHOLD))
-		)
-		users_matches_p2 = Match.objects.filter(
-			(Q(patient2__clinician=profile)&Q(score21__gte=MATCH_THRESHOLD))
-		)
+# 		users_matches_p1 = Match.objects.filter(
+# 			(Q(patient1__clinician=profile)&Q(score12__gte=MATCH_THRESHOLD))
+# 		)
+# 		users_matches_p2 = Match.objects.filter(
+# 			(Q(patient2__clinician=profile)&Q(score21__gte=MATCH_THRESHOLD))
+# 		)
 
-		context = {'user': user,
-		 			'profile': profile,
-		 			'matches_p1': users_matches_p1,
-		 			'matches_p2': users_matches_p2,}
-		return render(request, 'cases/view-matches.html', context)
+# 		context = {'user': user,
+# 		 			'profile': profile,
+# 		 			'matches_p1': users_matches_p1,
+# 		 			'matches_p2': users_matches_p2,}
+# 		return render(request, 'cases/view-matches.html', context)
 
-class Term:
-	def __init__(self, rating1, rating2, name):
-		self.name = name
-		self.user_rating = rating1
-		self.other_rating = rating2
-		self.html_class = "danger"
+# class Term:
+# 	def __init__(self, rating1, rating2, name):
+# 		self.name = name
+# 		self.user_rating = rating1
+# 		self.other_rating = rating2
+# 		self.html_class = "danger"
 
-def organizePatients(user_patient, other_patient, user, profile):
-		other_user = other_patient.clinician
-		user_phenotypes = Phenotype.objects.filter(patient=user_patient)	
-		other_phenotypes = Phenotype.objects.filter(patient=other_patient)
-		phenotype_dict = dict()
-		for p in list(user_phenotypes):
-			phenotype_dict[p.description] = Term(p.relevancy_score, "N/A", p.description)
-		for p in list(other_phenotypes):
-			if p.description not in phenotype_dict:
-				phenotype_dict[p.description] = Term("N/A", p.relevancy_score, p.description)
-			else:
-				t = phenotype_dict[p.description]
-				t.other_rating = p.relevancy_score
-				if t.other_rating == t.user_rating:
-					t.html_class = "success"
-				else:
-					t.html_class = "warning"
+# def organizePatients(user_patient, other_patient, user, profile):
+# 		other_user = other_patient.clinician
+# 		user_phenotypes = Phenotype.objects.filter(patient=user_patient)	
+# 		other_phenotypes = Phenotype.objects.filter(patient=other_patient)
+# 		phenotype_dict = dict()
+# 		for p in list(user_phenotypes):
+# 			phenotype_dict[p.description] = Term(p.relevancy_score, "N/A", p.description)
+# 		for p in list(other_phenotypes):
+# 			if p.description not in phenotype_dict:
+# 				phenotype_dict[p.description] = Term("N/A", p.relevancy_score, p.description)
+# 			else:
+# 				t = phenotype_dict[p.description]
+# 				t.other_rating = p.relevancy_score
+# 				if t.other_rating == t.user_rating:
+# 					t.html_class = "success"
+# 				else:
+# 					t.html_class = "warning"
 		
-		phenotypes = list()
-		for k in phenotype_dict:
-			phenotypes.append(phenotype_dict[k])		
+# 		phenotypes = list()
+# 		for k in phenotype_dict:
+# 			phenotypes.append(phenotype_dict[k])		
 
-		context = {'user_patient': user_patient,
-					#'user_phenotypes': user_phenotypes,
-					'other_patient': other_patient,
-					#'other_phenotypes': other_phenotypes,
-					'user': user,
-					'profile': profile,
-					'other_user': other_user,
-					'phenotypes': phenotypes,
-					}
-		return context
+# 		context = {'user_patient': user_patient,
+# 					#'user_phenotypes': user_phenotypes,
+# 					'other_patient': other_patient,
+# 					#'other_phenotypes': other_phenotypes,
+# 					'user': user,
+# 					'profile': profile,
+# 					'other_user': other_user,
+# 					'phenotypes': phenotypes,
+# 					}
+# 		return context
 
-@login_required(login_url=LOGIN_REQUIRED_URL)
-def match_detail(request, match_id):
-	user = request.user
-	match = Match.objects.get(pk=match_id)
-	if match.patient1.clinician.id == user.clinician.id:
-		context = organizePatients(match.patient1, match.patient2, user, user.clinician)
-		return render(request, 'cases/match-detail.html', context)
-	elif match.patient2.clinician.id == user.clinician.id:
-		context = organizePatients(match.patient2, match.patient1, user, user.clinician)
- 		return render(request, 'cases/match-detail.html', context)
-	else:
-		return forbidden_request(request)
+# @login_required(login_url=LOGIN_REQUIRED_URL)
+# def match_detail(request, match_id):
+# 	user = request.user
+# 	match = Match.objects.get(pk=match_id)
+# 	if match.patient1.clinician.id == user.clinician.id:
+# 		context = organizePatients(match.patient1, match.patient2, user, user.clinician)
+# 		return render(request, 'cases/match-detail.html', context)
+# 	elif match.patient2.clinician.id == user.clinician.id:
+# 		context = organizePatients(match.patient2, match.patient1, user, user.clinician)
+#  		return render(request, 'cases/match-detail.html', context)
+# 	else:
+# 		return forbidden_request(request)
 
 
 # View: view_cases
@@ -156,16 +157,16 @@ def view_cases(request):
 		 			'patient_list': patient_list,}
 		return render(request, 'cases/view-cases.html', context)
 
-# View: matches
-# Provides a link to "Find Matches"
-@login_required(login_url=LOGIN_REQUIRED_URL)
-def matches(request):
-	user = request.user
-	if user.is_authenticated() and user.is_active:
-		profile = user.clinician
-		context = {'user': user,
-		 			'profile': profile,}
-		return render(request, 'cases/matches.html', context)
+# # View: matches
+# # Provides a link to "Find Matches"
+# @login_required(login_url=LOGIN_REQUIRED_URL)
+# def matches(request):
+# 	user = request.user
+# 	if user.is_authenticated() and user.is_active:
+# 		profile = user.clinician
+# 		context = {'user': user,
+# 		 			'profile': profile,}
+# 		return render(request, 'cases/matches.html', context)
 
 # View: settings
 # Allows user to change Clinician fields ('the user profile') or settings

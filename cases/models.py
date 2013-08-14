@@ -74,14 +74,14 @@ class Phenotype(models.Model):
 
 # Class: Match
 # Represents a match between two patients.
-class Match(models.Model):
-	#User set fields
-    # Patient1 should always have a lower patient ID than patient2 as a way
-    # to check and avoid duplicate entries
-	patient1 = models.ForeignKey(Patient, related_name='+')
-	patient2 = models.ForeignKey(Patient, related_name='+')
-	score12 = models.FloatField()
-	score21 = models.FloatField()
+# class Match(models.Model):
+# 	#User set fields
+#     # Patient1 should always have a lower patient ID than patient2 as a way
+#     # to check and avoid duplicate entries
+# 	patient1 = models.ForeignKey(Patient, related_name='+')
+# 	patient2 = models.ForeignKey(Patient, related_name='+')
+# 	score12 = models.FloatField()
+# 	score21 = models.FloatField()
 
 # Class: PatientForm
 # Represents a ModelForm used to create an instance of a Patient

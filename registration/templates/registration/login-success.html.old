@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<body>
+	<h2> Login Success! </h2>
+	<p>Username: {{name}}</p>
+	<p>Active account? {{valid}}</p>
+	<p>User profile? {{profile}}</p>
+	{% url 'django.contrib.auth.views.password_change' as change_page %}
+	<a href="{{change_page}}"> Click here to change your password </a>
+</br>
+
+	{% url 'django.contrib.auth.views.logout' as logout %}
+	<a href="{{logout}}"> Click here to logout </a>
+
+	{% url 'cases.views.inbox' as inbox %}
+	<p>{{inbox}}</p>
+	<a href="{{inbox}}"> Click here to visit de inbox </a>
+	
+
+</body>
+</html>
+

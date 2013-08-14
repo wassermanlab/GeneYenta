@@ -7,8 +7,8 @@ from cases import views
 
 urlpatterns = patterns('',
     
-    # ex: view_matches/
-    url(r'^view-matches/$', views.view_matches, name='view_matches'),
+    # # ex: view_matches/
+    # url(r'^view-matches/$', views.view_matches, name='view_matches'),
 
     # ex: create-case/
     url(r'^create-case/$', views.create_case, name='create_case'),
@@ -16,8 +16,8 @@ urlpatterns = patterns('',
     # ex: view-cases/
     url(r'^view-cases/$', views.view_cases, name='view_cases'),
 
-    # ex: matches/
-    url(r'^matches/$', views.matches, name='matches'),
+    # # ex: matches/
+    # url(r'^matches/$', views.matches, name='matches'),
 
     # ex: settings/
     url(r'^settings/$', views.settings, name='settings'),
@@ -35,7 +35,7 @@ urlpatterns = patterns('',
     url(r'^(?P<clinician_id>\d+)/profile-edit/$', views.profile_edit, name='profile_edit'),
 
     # ex: 12/match-detail/
-    url(r'^(?P<match_id>\d+)/match-detail/$', views.match_detail, name='match_detail'),
+    # url(r'^(?P<match_id>\d+)/match-detail/$', views.match_detail, name='match_detail'),
 
     url(r'^archives/$', views.archives, name='archives'),
 

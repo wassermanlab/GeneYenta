@@ -17,7 +17,7 @@ urlpatterns = patterns('',
        'extra_context': 
        {
        'next':'login-success/'
-       },									}),
+       },									}, name='home'),
     
     # ex: gy3/registration/registration-success/
     url(r'^registration/registration-success/$', views.registration_success, name='registration-success'),
@@ -33,13 +33,13 @@ urlpatterns = patterns('',
         {'template_name':'registration/password-change.html',
         'post_change_redirect':'change-success/',
         }),
-    # ex: gy3/logout/
-    url(r'^logout/$', 'django.contrib.auth.views.logout', {'template_name':'registration/logout-success.html',
-        'extra_context': 
-        {
-        'next_page':'logout-success/'
-        },                                  }),
+    
 
+    # ex: gy3/logout/
+    url(r'^logout/$', 'django.contrib.auth.views.logout', {'next_page':'logout-success/'}),
+
+    # ex: gy3/logout/logout-success/
+    url(r'^logout/logout-success/$', views.logout_redirect, name='login-redirect'),
 
 
 # The following 3 url configs seem to work; but use the default admin templates
