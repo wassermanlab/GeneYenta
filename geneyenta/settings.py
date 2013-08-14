@@ -180,7 +180,5 @@ EMAIL_HOST_USER = 'root@geneyenta.cmmt.ubc.ca'
 #EMAIL_USE_TLS = False
 
 ALLOWED_INCLUDE_ROOTS = (
-    '/apps/GeneYenta/geneyenta/cases/static/',
-    '/apps/GeneYenta/geneyenta/cases/templates/dynatreereduced/dev/FullTree.html',
-    '/apps/GeneYenta/geneyenta/cases/static/cases/dynatree/dev/hpo.json'
+    '/apps/GeneYenta/static/cases/dynatree/dev/',
 )
