@@ -10,10 +10,10 @@ urlpatterns = patterns('',
     # url(r'^geneyenta/', include('geneyenta.foo.urls')),
     # url(r'^login/', include('registration.urls')),
 
-    url(r'^gy3/', include ('registration.urls')),
-    url(r'^gy3/accounts/', include('registration.urls')),
-    url(r'^gy3/cases/', include('cases.urls')),
-
+    url(r'^$', include ('registration.urls')),
+    url(r'^accounts/', include('registration.urls')),
+    url(r'^cases/', include('cases.urls')),
+    url(r'^matches/', include('matches.urls')),
     # url(r'^registration/', include('registration.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
