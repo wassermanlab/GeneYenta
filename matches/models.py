@@ -10,3 +10,4 @@ class Match(models.Model):
 	patient2 = models.ForeignKey(Patient, related_name='+')
 	score12 = models.FloatField()
 	score21 = models.FloatField()
+    match_date = models.DateTimeField()
