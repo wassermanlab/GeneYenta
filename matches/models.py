@@ -2,12 +2,13 @@ from django.db import models
 from cases.models import Patient
 
 # Class: Match
-# Represents a match between two patients.
+# Represents a match from the perspective of one patient.
 class Match(models.Model):
-    # Patient1 should always have a lower patient ID than patient2 as a way
-    # to check and avoid duplicate entries
-	patient1 = models.ForeignKey(Patient, related_name='+')
-	patient2 = models.ForeignKey(Patient, related_name='+')
-	score12 = models.FloatField()
-	score21 = models.FloatField()
-    match_date = models.DateTimeField()
+	patient = models.ForeignKey(Patient, related_name='+')
+	matched_patient = models.ForeignKey(Patient, related_name='+')
+	is_read = models.BooleanField()
+	is_important = models.BooleanField()
+	unilateral_score = models.FloatField()
+	bilateral_score = models.FloatField()
+	last_matched = models.DateTimeField()
+	notes = models.CharField(max_length=450)
