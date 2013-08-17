@@ -11,3 +11,6 @@ class Match(models.Model):
 	score = models.FloatField()
 	last_matched = models.DateTimeField()
 	notes = models.CharField(max_length=450)
+
+	def __unicode__(self):
+		return unicode(self.patient) +" : "+ unicode(self.matched_patient)

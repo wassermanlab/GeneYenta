@@ -17,36 +17,34 @@
 <div class="row">
 	<div class="col-lg-10 col-offset-1 col-12">
 
-{% if users_matches %}
-		<small>Click table headers to sort</small>
-		<table class="sortable table table-condensed">	
-            <thead>
-                <tr>
-                	<th>Matches for your cases by System ID.</th>    	
-            	</tr>
-          	</thead>
+{% if match_dict %}
+	{% for patient_key, match_list in match_dict.items %}
+		<h4>Matches for Patient #{{patient_key}}</h4>
 
-	{% for m in users_matches %}
-		<tr>
-			<td><a class="btn btn-info" href="{% url 'matches.views.match_detail' m.id %}">More info</a></td>
-			<td>{{m.patient.id}}</td>
-			<td>{{m.patient.private_id}}</td>
-			<td>NOT MUTUAL: {{m.unilateral_score}}</td>
-			<td>{{m.last_matched}}</td>
-		</tr>
+		<ul>
+			{% for m in match_list %}
+			<li>
+				<a href="{% url 'matches.views.match_detail' m.id %}">More info</a> <span>SCORE: {{m.score}}  LAST MATCHED:  {{m.last_matched}}</span>
+			</li>	
+			{% endfor %}
+		</ul>
+
 	{% endfor %}
-	</table>
+
 {% else %}
-	<h4>Sorry, we couldn't find any matches for you at this time.</h4>
+	<h4>There are no matches to display for your active cases.</h4>
+	<h5>Please note, if a case has been archived, you will not receive notifications of any potential matches for that case.</br> After unarchiving this case, all potential matches will be visible.</h5> 
 	</div>
 </div>
 {% endif %}
 
+<!--
 <button type="button" class="btn btn-danger" data-toggle="collapse" data-target="#demo">
   simple collapsible
 </button>
 
 <div id="demo" class="collapse in">herro</div>
+-->
 
 
 {% endblock %}

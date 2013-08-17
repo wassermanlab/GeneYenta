@@ -1,34 +1,32 @@
-# views.py -- matches
+# matches -- views.py
 
+
+#Django Library Imports
 from django.shortcuts import render, get_object_or_404
-
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
-
 from django.core.exceptions import ValidationError
-
 from django.db import models
+from django.contrib.auth.decorators import login_required
 
+#Model-related Imports
 from django.contrib.auth.models import User
 from registration.models import Clinician, ClinicianForm
 from cases.models import Patient, Phenotype, PatientForm
 from matches.models import Match
-# from django.contrib.auth import authenticate, login
 
-#import json
-from django.db.models import Q
-from django.contrib.auth.decorators import login_required
-# from django.core.mail import send_mail
-# from geneyenta.settings import EMAIL_HOST_USER
-#from django.contrib.auth.decorators import user_passes_test
+#Custom package imports
 from helper import forbidden_request, LOGIN_REQUIRED_URL
-#from django.contrib import messages
 
 
+#Constants
 MATCH_THRESHOLD = 0.7
-
 EDIT = True
 CREATE = False
+
+
+# View: [view name]
+# [function description]
 
 # View: view_matches
 # Match notification dashboard for authenticated users
@@ -41,14 +39,24 @@ def view_matches(request):
 		#BEWARE: Do not use the app name as a variable name for the template.
 		#i.e. I used 'matches':matches = Match.objects.filter...
 		#I got the strangest errors, where it would iterate over an empty set
-		matches = Match.objects.filter(patient__clinician=profile).filter(patient__is_archived=False)
+		users_matches = Match.objects.filter(patient__clinician=profile).filter(patient__is_archived=False)
 
+		patient_match_dict = dict()
+		for match in users_matches:
+			if match.patient in patient_match_dict: #uncessary?
+				patient_match_dict[match.patient.id] += match
+			else:
+				patient_match_dict[match.patient.id] = [match,]
+
+		print patient_match_dict
 		context = {'user': user,
 		 			'profile': profile,
-		 			'users_matches': matches,
+		 			'match_dict': patient_match_dict,
 		 		}
 		return render(request, 'matches/view-matches.html', context)
 
+# Helper Class
+# Used to simplify unpacking of values in the template-code
 class Term:
 	def __init__(self, rating1, rating2, name):
 		self.name = name
@@ -56,7 +64,8 @@ class Term:
 		self.other_rating = rating2
 		self.html_class = "danger"
 
-def organizePatients(user_patient, other_patient, user, profile):
+
+def _organizePatients(user_patient, other_patient, user, profile):
 		other_user = other_patient.clinician
 		user_phenotypes = Phenotype.objects.filter(patient=user_patient)	
 		other_phenotypes = Phenotype.objects.filter(patient=other_patient)
@@ -96,7 +105,7 @@ def match_detail(request, match_id):
 	user = request.user
 	match = Match.objects.get(pk=match_id)
 	if match.patient.clinician.id == user.clinician.id:
-		context = organizePatients(match.patient, match.matched_patient, user, user.clinician)
+		context = _organizePatients(match.patient, match.matched_patient, user, user.clinician)
 		return render(request, 'matches/match-detail.html', context)
 	else:
 		return forbidden_request(request)
