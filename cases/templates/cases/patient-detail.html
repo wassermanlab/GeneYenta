@@ -71,7 +71,19 @@
 <div class="row">
 	<div class="col-lg-4 col-offset-4 col-12">
 		<a class="btn btn-info" href="{% url 'cases.views.patient_edit' patient.id %}"> Edit this patient </a>
-		<a class="btn btn-danger" href="#">Archive case</a>
+	{% if patient.is_archived %}
+		<form name='archive-button' id="form" method="POST">
+			{% csrf_token %}
+			<input class="btn btn-danger" type="submit" value="Unarchive case"/>
+			<input type="hidden" name="unarchive" value="{{patient.id}}"/>		
+		</form>
+	{% else %}
+		<form name='archive-button' id="form" method="POST">
+			{% csrf_token %}
+			<input class="btn btn-danger" type="submit" value="Archive case"/>
+			<input type="hidden" name="archive" value="{{patient.id}}"/>		
+		</form>
+	{% endif %}
 	</div>
 </div>
 		

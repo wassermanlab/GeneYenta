@@ -8,7 +8,6 @@ class Match(models.Model):
 	matched_patient = models.ForeignKey(Patient, related_name='+')
 	is_read = models.BooleanField()
 	is_important = models.BooleanField()
-	unilateral_score = models.FloatField()
-	bilateral_score = models.FloatField()
+	score = models.FloatField()
 	last_matched = models.DateTimeField()
 	notes = models.CharField(max_length=450)

@@ -16,7 +16,8 @@
 
 <div class="row">
 	<div class="col-lg-10 col-offset-1 col-12">
-		{% if matches_p1 or matches_p2  %}
+
+{% if users_matches %}
 		<small>Click table headers to sort</small>
 		<table class="sortable table table-condensed">	
             <thead>
@@ -24,31 +25,22 @@
                 	<th>Matches for your cases by System ID.</th>    	
             	</tr>
           	</thead>
-			{% for m in matches_p1 %}
-				<tr>
-					<td><a class="btn btn-info" href="{% url 'matches.views.match_detail' m.id %}">More info</a></td>
-					<td>{{m.patient1.id}}</td>
-					<td>{{m.patient1.private_id}}</td>
-					<td>NOT MUTUAL: {{m.score12}}</td>
-					<td>{{m.last_modified}}</td>
-				</tr>
-			{% endfor %}
-			{% for m in matches_p2 %}
-				<tr>
-					<td><a class="btn btn-info" href="{% url 'matches.views.match_detail' m.id %}">More info</a></td>
-					<td>{{m.patient2.id}}</td>
-					<td>{{m.patient2.private_id}}</td>			
-					<td>NOT MUTUAL: {{m.score21}}</td>
-					<td>{{m.last_modified}}</td>
-				</tr>
-			{% endfor %}
-		</table>
-		{% else %}
-		<h4>Sorry, we couldn't find any matches for you at this time.</h4>
-		{% endif %}
+
+	{% for m in users_matches %}
+		<tr>
+			<td><a class="btn btn-info" href="{% url 'matches.views.match_detail' m.id %}">More info</a></td>
+			<td>{{m.patient.id}}</td>
+			<td>{{m.patient.private_id}}</td>
+			<td>NOT MUTUAL: {{m.unilateral_score}}</td>
+			<td>{{m.last_matched}}</td>
+		</tr>
+	{% endfor %}
+	</table>
+{% else %}
+	<h4>Sorry, we couldn't find any matches for you at this time.</h4>
 	</div>
 </div>
-
+{% endif %}
 
 <button type="button" class="btn btn-danger" data-toggle="collapse" data-target="#demo">
   simple collapsible

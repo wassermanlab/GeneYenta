@@ -37,22 +37,16 @@ def view_matches(request):
 	user = request.user
 	if user.is_authenticated() and user.is_active:
 		profile = user.clinician
-		# make 2 separate query sets and pass them as appropriate
 
-		#TODO: add a check for is_archived
-		#TODO: MATCH_THRESHOLD -- score12 and score21 should be actually a mutual score
-		
-		users_matches_p1 = Match.objects.filter(
-			(Q(patient1__clinician=profile)&Q(score12__gte=MATCH_THRESHOLD))
-		)
-		users_matches_p2 = Match.objects.filter(
-			(Q(patient2__clinician=profile)&Q(score21__gte=MATCH_THRESHOLD))
-		)
+		#BEWARE: Do not use the app name as a variable name for the template.
+		#i.e. I used 'matches':matches = Match.objects.filter...
+		#I got the strangest errors, where it would iterate over an empty set
+		matches = Match.objects.filter(patient__clinician=profile).filter(patient__is_archived=False)
 
 		context = {'user': user,
 		 			'profile': profile,
-		 			'matches_p1': users_matches_p1,
-		 			'matches_p2': users_matches_p2,}
+		 			'users_matches': matches,
+		 		}
 		return render(request, 'matches/view-matches.html', context)
 
 class Term:
@@ -85,9 +79,7 @@ def organizePatients(user_patient, other_patient, user, profile):
 			phenotypes.append(phenotype_dict[k])		
 
 		context = {'user_patient': user_patient,
-					#'user_phenotypes': user_phenotypes,
 					'other_patient': other_patient,
-					#'other_phenotypes': other_phenotypes,
 					'user': user,
 					'profile': profile,
 					'other_user': other_user,
@@ -103,23 +95,9 @@ def organizePatients(user_patient, other_patient, user, profile):
 def match_detail(request, match_id):
 	user = request.user
 	match = Match.objects.get(pk=match_id)
-	if match.patient1.clinician.id == user.clinician.id:
-		context = organizePatients(match.patient1, match.patient2, user, user.clinician)
+	if match.patient.clinician.id == user.clinician.id:
+		context = organizePatients(match.patient, match.matched_patient, user, user.clinician)
 		return render(request, 'matches/match-detail.html', context)
-	elif match.patient2.clinician.id == user.clinician.id:
-		context = organizePatients(match.patient2, match.patient1, user, user.clinician)
- 		return render(request, 'matches/match-detail.html', context)
 	else:
 		return forbidden_request(request)
 
-
-# View: matches
-# Provides a link to "Find Matches"
-@login_required(login_url=LOGIN_REQUIRED_URL)
-def matches(request):
-	user = request.user
-	if user.is_authenticated() and user.is_active:
-		profile = user.clinician
-		context = {'user': user,
-		 			'profile': profile,}
-		return render(request, 'matches/matches.html', context)

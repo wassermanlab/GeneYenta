@@ -1,37 +1,32 @@
 {% extends 'cases/base.html' %}
 
-{% block title %}GeneYenta View Cases{% endblock %}
+{% block title %}GeneYenta Archives{% endblock %}
 
-{% block header %}Your Cases{% endblock %}
-
+{% block header %}Archived Cases{% endblock %}
 
 {% block content %}
-
-<div class="row">
-	<div class="col-lg-4 col-offset-8 col-12">
-		{% url 'cases.views.create_case' as create_case %}
-		<a class="btn btn-default" href="{{create_case}}"> Create a new case </a>
-	</div>
-</div>
+<form name='unarchive-form' id="form" method="POST">
+		{% csrf_token %}
 
 <div class="row">
 	<div class="col-lg-10 col-offset-1 col-12">
-		{% if patient_list %}
+		{% if patients %}
 		<small>Click table headers to sort</small>
 		<table class="sortable table table-condensed">	
             <thead>
                 <tr>
+                	<th>Unarchive?</th>
                 	<th></th>
                   	<th>Private Identifier</th>
                   	<th>System ID</th>
                   	<th>Clinic</th>
                 	<th>Institute</th>
                 	<th>Year of First Appt.</th>
-                	<th>Last Modified</th>
             	 </tr>
           	</thead>
-			{% for p in patient_list %}
+			{% for p in patients %}
 				<tr>
+					<td><input type="checkbox" name="unarchive" id="option{{p.id}}" value="{{p.id}}"/></td>
 					<td>
 						<a href="{% url 'cases.views.patient_detail' p.id %}"> More Info 
 						</a>
@@ -41,12 +36,19 @@
 					<td>{{p.clinic}}</td>
 					<td>{{p.institute}}</td>
 					<td>{{p.first_appointment_year}}</td>
-					<td>{{p.last_modified}}</td>
 				</tr>
 			{% endfor %}
 		</table>
+<div class="row">
+	<div class="col-lg-2 col-offset-5 col-12">
+		<input class="btn btn-default" type="submit" value="Unarchive Selected Cases"/>	
+	</div>
+
+</div>
+
+	</form>
 		{% else %}
-		<h4>There are no unarchived cases to display.</h4> 
+		<h4>There are no archived cases to display.</h4>
 		{% endif %}
 	</div>
 </div>
@@ -57,9 +59,3 @@
 {% block endbody %}
 <script src="{{STATIC_URL}}cases/js/sorttable.js"></script>
 {% endblock %}
-
-
-
-
-
-
