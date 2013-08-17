@@ -67,6 +67,7 @@ class Phenotype(models.Model):
 	patient = models.ForeignKey(Patient)
 	hpo_id = models.CharField(max_length=10)
 	relevancy_score = models.IntegerField(default=0)
+	date_added = models.DateTimeField(auto_now_add=True)
 	description = models.CharField(max_length=255)
 
 	def __unicode__(self):
