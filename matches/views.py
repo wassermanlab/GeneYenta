@@ -8,6 +8,7 @@ from django.template import RequestContext, loader
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 #Model-related Imports
 from django.contrib.auth.models import User
@@ -41,17 +42,26 @@ def view_matches(request):
 		#I got the strangest errors, where it would iterate over an empty set
 		users_matches = Match.objects.filter(patient__clinician=profile).filter(patient__is_archived=False)
 
+		#This dictionary maps each patient id to an array of matches for that patient.
+		#The 0th index of the list is reserved for the number of unread match notifications.
 		patient_match_dict = dict()
+		unread_match_totals = dict()
 		for match in users_matches:
-			if match.patient in patient_match_dict: #uncessary?
-				patient_match_dict[match.patient.id] += match
+			patient = match.patient
+			if patient in patient_match_dict: #uncessary?
+				if not match.is_read:
+					unread_match_totals[patient.id] += 1
+				patient_match_dict[patient.id] += match
 			else:
-				patient_match_dict[match.patient.id] = [match,]
-
-		print patient_match_dict
+				if match.is_read:
+					unread_match_totals[patient.id] = 0
+				else:
+					unread_match_totals[patient.id] = 1
+				patient_match_dict[patient.id] = [match,]		
 		context = {'user': user,
 		 			'profile': profile,
 		 			'match_dict': patient_match_dict,
+		 			'unread_dict': unread_match_totals,
 		 		}
 		return render(request, 'matches/view-matches.html', context)
 
@@ -105,8 +115,25 @@ def match_detail(request, match_id):
 	user = request.user
 	match = Match.objects.get(pk=match_id)
 	if match.patient.clinician.id == user.clinician.id:
-		context = _organizePatients(match.patient, match.matched_patient, user, user.clinician)
-		return render(request, 'matches/match-detail.html', context)
+		if not match.is_read:
+			match.is_read = True
+			match.save()
+		if request.method == 'POST':
+			try:
+				notes = request.POST.__getitem__('notes')
+				notes = str(notes).replace("\"","\'") #stops input from escaping function params in html
+				print notes
+				match.notes = notes
+				message = "Your notes were saved successfully."
+				messages.success(request, message, extra_tags='alert alert-success')
+				match.save()
+				return HttpResponseRedirect('')
+			except Exception,e:
+				print str(e)
+		else:
+			context = _organizePatients(match.patient, match.matched_patient, user, user.clinician)
+			context['current_match'] = match
+			return render(request, 'matches/match-detail.html', context)
 	else:
 		return forbidden_request(request)
 

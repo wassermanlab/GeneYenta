@@ -1,0 +1,24 @@
+<!-- Modal -->
+<div class="modal fade" id="add_notes">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title">Add Notes About This Match</h4>
+			</div>
+			<div class="modal-body">
+				<form name='archive-button' id="form" method="POST">
+					{% csrf_token %}
+				<p><small> Max length is 450 characters.</small><p>
+				<textarea id="add-notes-input" maxlength="450" name="notes">{{current_match.notes}}</textarea>
+				
+			</div>  
+			
+			<div class="modal-footer">
+				<input class="btn btn-success" type="submit" value="Save Notes"/>
+				<button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+				</form>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

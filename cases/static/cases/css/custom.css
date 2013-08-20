@@ -89,3 +89,29 @@ div#results {
 	max-height: 241px;
 	overflow: auto;
 }
+
+
+#pup {
+  position:absolute;
+  z-index:200; /* aaaalways on top*/
+  padding: 3px;
+  margin-left: 10px;
+  margin-top: 5px;
+  width: 400px;
+/*  border: 1px solid black;
+*/  background-color: #64B59A;
+  color: white;
+  font-size: 0.97em;
+  -moz-border-radius: 5px;
+	border-radius: 5px;
+	word-break:break-all;
+}
+
+div.endbody-padding {
+	margin-bottom: 60px;
+}
+
+div.notification {
+	display:inline;
+	color: red;
+}

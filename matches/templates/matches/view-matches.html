@@ -1,16 +1,21 @@
 {% extends 'cases/base.html' %}
+{% load dict_variable_key_filter %}
+
 
 {% block title %}GeneYenta Matches{% endblock %}
 
 {% block header %}Your Matches{% endblock %}
 
+
+
 {% block content %} 
 
 <div class="row">
-	<div class="col-9">
+	<div class="col-lg-8 col-offset-1 col-12">
+		<h5><small>Click on the headers below to see the matches for each patient.</small></h5>
 	</div>
-	<div class="col-3">
-		<a class="btn btn-success" href="#">Find More Matches</a>
+	<div class="col-lg-3 col-12">
+		<a class="btn btn-default" href="#">Find More Matches</a>
 	</div>
 </div>
 
@@ -18,19 +23,53 @@
 	<div class="col-lg-10 col-offset-1 col-12">
 
 {% if match_dict %}
-	{% for patient_key, match_list in match_dict.items %}
-		<h4>Matches for Patient #{{patient_key}}</h4>
+<ul>
+	{% for patient_id_key, match_list in match_dict.items %}
+	<li>
+		<h4 data-toggle="collapse" data-target="#list{{patient_id_key}}">
+			Matches for Patient #{{patient_id_key}}	
+			<small>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				New (<div class="notification">{{unread_dict|get_item:patient_id_key}}</div>)
+				Important(<div class="notification">X</div>)
+			</small>
+		</h4>
+	</li>
 
-		<ul>
+
+	
+		<div id="list{{patient_id_key}}" class="collapse out">
+		
+			<table class="table table-condensed sortable">
+				<thead>
+					<tr>
+						<td></td>
+						<td>Date Matched</td>
+						<td>Score</td>
+					</tr>
+				</thead>
+			<tbody>
 			{% for m in match_list %}
-			<li>
-				<a href="{% url 'matches.views.match_detail' m.id %}">More info</a> <span>SCORE: {{m.score}}  LAST MATCHED:  {{m.last_matched}}</span>
-			</li>	
+			<tr>
+				{# Asjdfkajshdfkajhsdkfjh #}
+				<td><a href="{% url 'matches.views.match_detail' m.id %}">More info</a></td>
+
+				<td><span>{{m.last_matched}}</span></td>
+				<td>
+				<span>{{m.score}}</span>
+				<a onmouseover='nhpup.popup("{{m.notes}}")' href="#">Hover to view notes</a>
+				</td>
+			</tr>
+				
 			{% endfor %}
-		</ul>
+		</tbody>
+			</table>
+		
+		</div>
+		
 
 	{% endfor %}
-
+</ul>
 {% else %}
 	<h4>There are no matches to display for your active cases.</h4>
 	<h5>Please note, if a case has been archived, you will not receive notifications of any potential matches for that case.</br> After unarchiving this case, all potential matches will be visible.</h5> 
@@ -53,7 +92,8 @@
 
 
 {% block endbody %}
-
+<div class="endbody-padding"></div>
+<script type="text/javascript" src="{{STATIC_URL}}cases/js/popup.js"></script>
 <script src="{{STATIC_URL}}cases/js/sorttable.js"></script>
 {% endblock %}
 

@@ -15,10 +15,10 @@
 					<h5>Private ID: {{user_patient.private_id}}</h5>
 			</div>
 			<div class="col-lg-4 col-12">
-				<button onclick="show_modal()" class="btn btn-info">
+				<button onclick="show_modal('#user_summary')" class="btn btn-info">
 					Review Your Case Summary
 				</button>
-				<button class="btn btn-danger">Archive Match</button>
+				<button onclick="show_modal('#add_notes')" class="btn btn-danger">Add Notes</button>
 			</div>
 		</div>
 
@@ -92,6 +92,8 @@
 	
 {% ssi "/apps/GeneYenta/matches/templates/matches/match-detail-modal.html" parsed %}
 
+{% ssi "/apps/GeneYenta/matches/templates/matches/add-notes-modal.html" parsed %}
+
 </div>
 
 {% endblock %}
@@ -103,8 +105,8 @@
 <script src="{{STATIC_URL}}cases/js/sorttable.js"></script>
 
 <script type="text/javascript">
-		function show_modal(){
-			$('#user_summary').modal('show');
+		function show_modal(id){
+			$(id).modal('show');
 		}
 </script>
 
