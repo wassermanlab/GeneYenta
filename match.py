@@ -95,8 +95,9 @@ class Patient:
 
     """
 
-    def __init__(self, id, last_modified):
+    def __init__(self, id, clinician_id, last_modified):
         self.id = id
+        self.clinician_id = clinician_id
         self.last_modified = last_modified
         self.terms = None
         self.all_terms = None
@@ -162,14 +163,14 @@ class GYMatcher:
 
         """
 
-        sql = "SELECT id, last_modified FROM cases_patient " \
+        sql = "SELECT id, clinician_id, last_modified FROM cases_patient " \
               "where id = {0}".format(patient_id)
         cur = self.db.cursor()
         cur.execute(sql)
         row = cur.fetchone()
         #dt = datetime.strptime(row[1], "%Y-%m-%d %H:%M:%S")
         #patient = Patient(row[0], dt)
-        patient = Patient(row[0], row[1])
+        patient = Patient(row[0], row[1], row[2])
 
         return patient
 
@@ -180,7 +181,8 @@ class GYMatcher:
 
         """
 
-        sql = "SELECT id, last_modified FROM cases_patient order by id"
+        sql = "SELECT id, clinician_id, last_modified " \
+              "FROM cases_patient order by id"
         cur = self.db.cursor()
         cur.execute(sql)
         rows = cur.fetchall()
@@ -189,7 +191,7 @@ class GYMatcher:
         for row in rows:
             #dt = datetime.strptime(row[1], "%Y-%m-%d %H:%M:%S")
             #patients.append(Patient(row[0], dt))
-            patients.append(Patient(row[0], row[1]))
+            patients.append(Patient(row[0], row[1], row[2]))
 
         return patients
 
@@ -544,16 +546,20 @@ class GYMatcher:
     def matchPatientToAll(self, patient):
         """
         Compute matches of the given patient to all other patients in the
-        GeneYenta DB and update the database accordingly.
+        GeneYenta DB and update the database accordingly. Do not match
+        patient to him/herself or to other patients belonging to the same
+        clinician.
 
         """
 
         patients = self.fetchAllPatients()
 
         for other_patient in patients:
-            if patient.id != other_patient.id:
-                self.matchPatientToPatient(patient, other_patient)
-                self.matchPatientToPatient(other_patient, patient)
+            if other_patient.id != patient.id \
+               and other_patient.clinician_id != patient.clinician_id:
+                    # Do two-way matching
+                    self.matchPatientToPatient(patient, other_patient)
+                    self.matchPatientToPatient(other_patient, patient)
 
     def matchAllPatients(self):
         """
@@ -566,12 +572,14 @@ class GYMatcher:
 
         for patient1 in patients:
             for patient2 in patients:
-                if patient1.id < patient2.id:
-                    # Compute two-way patient to patient match below so
-                    # skip iterations where patient1.id > patient2.id
-                    # (and obviously we don't match a patient with itself)
-                    self.matchPatientToPatient(patient1, patient2)
-                    self.matchPatientToPatient(patient2, patient1)
+                if patient1.id < patient2.id \
+                   and patient1.clinician_id != patient2.clinician_id:
+                        # Compute two-way patient to patient match below.
+                        # Skip iterations where patient1.id > patient2.id.
+                        # Don't match a patient to his/herself or match
+                        # patients belonging to the same clinician.
+                        self.matchPatientToPatient(patient1, patient2)
+                        self.matchPatientToPatient(patient2, patient1)
 
 
 def main():
