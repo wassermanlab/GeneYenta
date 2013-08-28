@@ -8,7 +8,12 @@
 {% block content %}
 
 <div class="row">
-	<div class="col-lg-4 col-offset-8 col-12">
+	<div class="col-offset-1 col-lg-7 col-6">
+		{% if patient_list %}
+		<h5><small>Click table headers to sort</small></h5>
+		{% endif %}
+	</div>
+	<div class="col-lg-4 col-6">
 		{% url 'cases.views.create_case' as create_case %}
 		<a class="btn btn-default" href="{{create_case}}"> Create a new case </a>
 	</div>
@@ -17,19 +22,19 @@
 <div class="row">
 	<div class="col-lg-10 col-offset-1 col-12">
 		{% if patient_list %}
-		<small>Click table headers to sort</small>
 		<table class="sortable table table-condensed">	
             <thead>
                 <tr>
                 	<th></th>
-                  	<th>Private Identifier</th>
-                  	<th>System ID</th>
+                  	<th>Private ID.</th>
+                  	<th>GeneYenta ID.</th>
                   	<th>Clinic</th>
                 	<th>Institute</th>
-                	<th>Year of First Appt.</th>
+                	<th>Year</th>
                 	<th>Last Modified</th>
             	 </tr>
           	</thead>
+          	<tbody>
 			{% for p in patient_list %}
 				<tr>
 					<td>
@@ -44,6 +49,7 @@
 					<td>{{p.last_modified}}</td>
 				</tr>
 			{% endfor %}
+		</tbody>
 		</table>
 		{% else %}
 		<h4>There are no unarchived cases to display.</h4> 

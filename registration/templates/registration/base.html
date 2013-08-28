@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>{% block title %}{% endblock %}</title>
+  <!-- Bootstrap includes -->
+  <link href="{{STATIC_URL}}cases/css/bootstrap.min.css" rel="stylesheet" media="screen">
+  <link href="{{STATIC_URL}}cases/css/custom.css" rel="stylesheet" media="screen">
+
+</head>
+
+<body>
+<div class="row">
+  <div class=" col-lg-4 col-offset-1">
+    <h1>GeneYenta</h1>
+   </div>
+</div>
+
+
+<div class="row">
+    <div class="col-offset-1 col-lg-10 col-sm-10 col-12">
+        {% if messages %} 
+            {% for message in messages %} 
+            <div id='messages' class="{{message.tags}}">
+              <p>{{message}}</p> 
+            </div>
+            {% endfor %} 
+        {% endif %} 
+    </div>
+</div>
+
+<!-- this is breaking the dynatree if it is included anywhere else
+must be fixed... 
+ -->
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+{% block content %}
+{% endblock %}
+
+
+{% block endbody %}
+{% endblock %}
+
+<div class="endbody-padding"></div>
+<script src="{{STATIC_URL}}cases/js/bootstrap.min.js"></script>
+
+
+</body>
+</html>

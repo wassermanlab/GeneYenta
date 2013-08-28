@@ -4,7 +4,8 @@
 import json
 
 #Django Library Imports
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
+from django.shortcuts import get_object_or_404 
 from django.http import HttpResponseRedirect
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -14,8 +15,11 @@ from django.contrib import messages
 
 #Model-Related Imports
 from django.contrib.auth.models import User
-from registration.models import Clinician, ClinicianForm
-from cases.models import Patient, Phenotype, PatientForm
+from registration.models import Clinician 
+from registration.models import ClinicianForm 
+from cases.models import Patient
+from cases.models import Phenotype
+from cases.models import PatientForm
 
 #Custom Package Imports
 from helper import forbidden_request, LOGIN_REQUIRED_URL
@@ -24,15 +28,13 @@ from helper import forbidden_request, LOGIN_REQUIRED_URL
 EDIT = True
 CREATE = False
 
-#Note: 
-#Helper functions starting with a single underscore are at the end of the file.
-
+#NOTE: Helper functions starting with a single underscore are at the end of the file.
 
 # View: [title]
 # [interface description]
 
 # View: view_cases
-# List of all cases associated with given clinician profile
+# List of all unarchived cases associated with given clinician profile
 # Provides links to editing patient profiles/cases
 @login_required(login_url=LOGIN_REQUIRED_URL)
 def view_cases(request):
@@ -83,10 +85,13 @@ def create_case(request):
 # View: patient_detail
 # Provides a summary for the user of an indiviual case/Patient 
 # associated with their account
+# IMPORTANT: Since the patient id is passed as an argument via url, it is important
+# to make sure that the patient with this id actually belongs to the authenticated user.
+# (see more commments below)
 @login_required(login_url=LOGIN_REQUIRED_URL)
 def patient_detail(request, patient_id):
 	patient = get_object_or_404(Patient, pk=patient_id)
-	phenotypes = patient.phenotype_set.all() #using related model lookup
+	phenotypes = patient.phenotype_set.all() #using related modeli shortcut '_set' lookup
 	
 	# Crucial to check whether the user is requesting data that is not
 	# associated with their account (the current authenticated User)
@@ -113,15 +118,17 @@ def patient_detail(request, patient_id):
 
 # View: patient_edit
 # Provides a form to edit/change an individual Patient model
+# IMPORTANT: Since the patient id is passed as an argument via url, it is important
+# to make sure that the patient with this id actually belongs to the authenticated user.
 @login_required(login_url=LOGIN_REQUIRED_URL)  
 def patient_edit(request, patient_id):
 	patient = get_object_or_404(Patient, pk=patient_id)
-
-	phenotypes = patient.phenotype_set.all()
-	pheno_dict = {}
+	phenotypes = patient.phenotype_set.all() #gets all phenotypes linked by FK to the patient
+	pheno_dict = {} #python dict. mapping hpo_id's to relevancy scores
 	for p in phenotypes:
 		pheno_dict[p.hpo_id] = p.relevancy_score
-	old_phenotypes_json = json.dumps(pheno_dict)
+
+	old_phenotypes_json = json.dumps(pheno_dict) #creates a JSON string that is used to pre-select these phenotypes in the UI
 
 	if request.user.clinician.id == patient.clinician.id: # IMPORTANT FOR SECURITY
 		if request.method == 'POST':
@@ -204,14 +211,14 @@ def archives(request):
 def _process_phenotypes(request, patient, getlist_key, flag):
 	# Phenotype object processing
 	json_str = str(request.POST.getlist(getlist_key)) #gets json as string
-	print json_str
+	#print json_str
 	processed = json_str.replace("[u\'","",1) #removes unecessary prefix [u'
-	print processed
+	#print processed
 	if flag is EDIT:
 		processed = processed.replace("\', u\'\']","",1) #removes uncessary suffix ',u'']
 	else:
 		processed = processed.replace("\']","",1) #removes uncessary suffix ',u'']
-	print processed
+	#print processed
 	# only after processing will it be successfully converted to an array of dictionaries
 	json_data = json.loads(processed)
 	for term in json_data: #iterates through array
@@ -238,7 +245,7 @@ def _change_archive_status(request, key, status, message):
 		messages.success(request, message, extra_tags='alert alert-success')
 		p.save()
 	except Exception,e:
-		print str(e)
+		print '_change_archive_status failure: '+ str(e)
 
 
 

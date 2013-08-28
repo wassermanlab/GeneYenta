@@ -1,9 +1,14 @@
 # cases -- models.py
 
+# Django Core Imports
+from django import forms
+
+# Model Related Imports
 from django.db import models
 from registration.models import Clinician
 from django.forms import ModelForm
-from django import forms
+
+# Widget Imports
 #from django.forms.extras.widgets import SelectDateWidget
 
 
@@ -35,8 +40,10 @@ MONTHS = (
 # Represents an individual clinical case that is associated with a single user via
 # ForeignKey link to the Clinician model
 class Patient(models.Model):
-	#User set fields
+	# Foreign Key
 	clinician = models.ForeignKey(Clinician) #ForeignKey allows many to one; instead of OneToOne
+	
+	#User set fields
 	case_summary = models.TextField(max_length=2500)
 	institute = models.CharField(max_length=64)
 	clinic = models.CharField(max_length=64)
@@ -45,7 +52,6 @@ class Patient(models.Model):
 	first_appointment_year = models.IntegerField('Year of first appointment')
 	first_appointment_age = models.IntegerField('Age at first appointment')
 	is_archived = models.BooleanField(default=False)
-
 	private_id = models.CharField(max_length=20) #encrypted?
 
 	#System-set fields
@@ -61,32 +67,23 @@ class Patient(models.Model):
 # Class: Phenotype
 # Represents a single phenotype or symptom associated with a single Patient
 # Multiple phenotypes can be linked to a single Patient
-# hpo id
-# relevancy rating
 class Phenotype(models.Model):
+	# Foreign Key
 	patient = models.ForeignKey(Patient)
-	hpo_id = models.CharField(max_length=10)
-	relevancy_score = models.IntegerField(default=0)
-	date_added = models.DateTimeField(auto_now_add=True)
-	description = models.CharField(max_length=255)
+	
+	hpo_id = models.CharField(max_length=10) #HPO ID from the tree
+	relevancy_score = models.IntegerField(default=0) #User-supplied relevancy score (1-5)
+	date_added = models.DateTimeField(auto_now_add=True) #automatically added timestamp
+	description = models.CharField(max_length=255) #The human-readable name of the phenotype 
 
 	def __unicode__(self):
 		return unicode("Patient {0}: {1}".format(self.patient.id, self.hpo_id))
 
-# Class: Match
-# Represents a match between two patients.
-# class Match(models.Model):
-# 	#User set fields
-#     # Patient1 should always have a lower patient ID than patient2 as a way
-#     # to check and avoid duplicate entries
-# 	patient1 = models.ForeignKey(Patient, related_name='+')
-# 	patient2 = models.ForeignKey(Patient, related_name='+')
-# 	score12 = models.FloatField()
-# 	score21 = models.FloatField()
-
 # Class: PatientForm
 # Represents a ModelForm used to create an instance of a Patient
 class PatientForm(ModelForm):
+	# This additional json field is used to capture the phenotype information
+	# harvested by the Jquery scripts on the Create A Case or Edit a Case page.
 	json = forms.CharField(widget=forms.HiddenInput(), required=False) #not sure if safe
 	class Meta:
 		model = Patient

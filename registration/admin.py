@@ -10,10 +10,12 @@ admin.site.register(Clinician)
 
 # Custom Actions for Admin Interface
 def activate_account(self, request, queryset): 
+	""" This action allows the admin to bulk activate multiple accounts."""
 	queryset.update(is_active=True)
 activate_account.short_description = "Activate selected user account(s)"
 
 def deactivate_account(self, request, queryset):
+	""" This actions allows the admin to bulk deactivate multple accounts."""
 	queryset.update(is_active=False)
 deactivate_account.short_description = "Deactivate selected user account(s)"
 

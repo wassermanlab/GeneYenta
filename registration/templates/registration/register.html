@@ -1,17 +1,33 @@
-<!DOCTYPE html>
-<html>
-<body>
-	<h2> GeneYenta Registration </h2>
+
+
+
+{% extends 'registration/base.html' %}
+
+{% block title %}GeneYenta Registration{% endblock %}
+
+{% block content %}
+<div class="row">
+	<div class="col-lg-11 col-offset-1 col-12">
+
+<div class="col-lg-6"> 
 {% if form.errors %}
 {{form.errors}}
 {% endif %}
 
     <form method="POST">
+    	<h4> GeneYenta User Login Info</h4>
+    	<p> This is the information that you will use to log into the system.</p>
         {% csrf_token %}
-        {{userform}}
-    </br></br>
-        {{userprofileform}}
-        <input type="submit" value="Submit"/>
+        {{userform.as_p}}
+</div>
+<div class="col-lg-6"> 
+		<h4> GeneYenta Profile Info</h4>
+    	<p> This is the information that will be visisble to the other clinicians.</p>
+        {{userprofileform.as_p}}
+        <input class="btn btn-default" type="submit" value="Submit"/>
+        <input type="hidden" name="next" value="{{ next }}" />
     </form>
-</body>
-</html>
+</div>
+</div>
+</div>
+{% endblock %}

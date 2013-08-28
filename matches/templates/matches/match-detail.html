@@ -10,21 +10,17 @@
 <div class="row">
 	<div class="col-lg-11 col-offset-1 col-12">
 		<div class="row">
-			<div class="col-lg-8 col-12">
-					<h4> This is a potential match for your case with System ID: {{user_patient.id}} </h4>
-					<h5>Private ID: {{user_patient.private_id}}</h5>
+			<div class="col-lg-11 col-12">
+				<div class="alert">
+					<h3> This is a potential match for your case with GeneYenta ID: {{user_patient.id}} (Private ID: {{user_patient.private_id}}) </h3>
+				</div>
 			</div>
-			<div class="col-lg-4 col-12">
-				<button onclick="show_modal('#user_summary')" class="btn btn-info">
-					Review Your Case Summary
-				</button>
-				<button onclick="show_modal('#add_notes')" class="btn btn-danger">Add Notes</button>
-			</div>
+			
 		</div>
 
 	<div id="content-row" class="row">
 		<div id="contact-info" class="col-lg-4 col-12">
-			<h4>Contact Info</h4>
+			<h4>Matched Clinician's Contact Info.</h4>
 			<dl class="dl-horizontal">
 	  			<dt>Name: </dt>
 	  			<dd>{{other_user.name}}</dd>
@@ -45,8 +41,10 @@
 			</dl>
 		</div>
 		<div id="match_case_summary" class="col-lg-7 col-12">
-			<h4> Matching Patient's Information </h4>
+			<h4> Matched Patient's Information </h4>
 			<dl class="dl-horizontal">
+				<dt>GeneYenta ID:</dt>
+				<dd>{{other_patient.id}}</dd>
 				<dt>Clinic:</dt>
 				<dd>{{other_patient.clinic}}</dd>
 				<dt>Gender:</dt>
@@ -62,7 +60,7 @@
 				<dt>Case Last Modified:</dt>
 				<dd>{{other_patient.last_modified}}</dd>
 			</dl>
-			<h4>Matched Case Summary</h4>
+			<h4>Matched Patient's Case Summary</h4>
 			<p class="summary">{{other_patient.case_summary}}</p>		
 		</div>
 	</div>
@@ -90,6 +88,12 @@
 	</div>
 </div>
 	
+<div class="col-offset-3 col-lg-4 col-12" style="margin-bottom: 30px;">
+	<button onclick="show_modal('#user_summary')" class="btn btn-info">
+		Review Your Case Summary
+	</button>
+	<button onclick="show_modal('#add_notes')" class="btn btn-danger">Add Notes</button>
+</div>
 {% ssi "/apps/GeneYenta/matches/templates/matches/match-detail-modal.html" parsed %}
 
 {% ssi "/apps/GeneYenta/matches/templates/matches/add-notes-modal.html" parsed %}

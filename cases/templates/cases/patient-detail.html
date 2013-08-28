@@ -6,13 +6,13 @@
 
 {% block content %}
 <div class="row">
-<div class="col-lg-10 col-offset-1 col-12">
+<div class="col-lg-11 col-offset-1 col-12">
 
 <div class="row">
 	<div class="col-lg-4 col-12">	
 			<h4>General Info</h4>
 			<dl class="dl-horizontal">
-			<dt> Case System ID:</dt>
+			<dt> GeneYenta ID:</dt>
 			<dd> {{patient.id}}</dd>
 			<dt> Private ID: </dt>
 			<dd> {{patient.private_id}}</dd>
@@ -70,15 +70,15 @@
 
 <div class="row">
 	<div class="col-lg-4 col-offset-4 col-12">
-		<a class="btn btn-info" href="{% url 'cases.views.patient_edit' patient.id %}"> Edit this patient </a>
+		<a class="btn btn-default" href="{% url 'cases.views.patient_edit' patient.id %}"> Edit this patient </a>
 	{% if patient.is_archived %}
-		<form name='archive-button' id="form" method="POST">
+		<form name='archive-button' id="form" method="POST" style="display:inline;">
 			{% csrf_token %}
 			<input class="btn btn-danger" type="submit" value="Unarchive case"/>
 			<input type="hidden" name="unarchive" value="{{patient.id}}"/>		
 		</form>
 	{% else %}
-		<form name='archive-button' id="form" method="POST">
+		<form name='archive-button' id="form" method="POST" style="display:inline;">
 			{% csrf_token %}
 			<input class="btn btn-danger" type="submit" value="Archive case"/>
 			<input type="hidden" name="archive" value="{{patient.id}}"/>		

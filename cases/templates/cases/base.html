@@ -41,10 +41,10 @@
            
             <div class="nav-collapse collapse navbar-responsive-collapse">
                 <ul class="nav navbar-nav">
-                    <li><a href="{{matches}}">Matches</a></li>
-                    <li><a href="{{cases}}">Cases</a></li>
-                    <li><a href="{{archives}}">Archives</a></li>
-                    <li><a href="{{settings}}">Settings</a></li>
+                    <li id="matches-tab"><a href="{{matches}}">Matches</a></li>
+                    <li id="cases-tab"><a href="{{cases}}">Cases</a></li>
+                    <li id="archives-tab"><a href="{{archives}}">Archives</a></li>
+                    <li id="settings-tab"><a href="{{settings}}">Settings</a></li>
                     
                     <li>
                         <p class="navbar-text" style="margin-left:30px;"> Signed in as {{user.username}}</p>
@@ -83,7 +83,7 @@ must be fixed...
 {% block endbody %}
 {% endblock %}
 
-
+<div class="endbody-padding"></div>
 <script src="{{STATIC_URL}}cases/js/bootstrap.min.js"></script>
 
 

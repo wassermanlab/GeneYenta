@@ -1,44 +1,47 @@
 # registration -- urls.py
 
-from django.conf.urls import patterns, url
+
+from django.conf.urls import patterns
+from django.conf.urls import url 
 from registration import views
 # from django.core.urlresolvers import reverse
 
-
+# All these urls have been already truncated by the URL-Conf in geneyenta.urls
 urlpatterns = patterns('',
-	
+
+	#ex: /	
     url(r'^$', views.home_redirect, name='home_redirect'),
 
-    # ex: gy3/login/login-success/
+	 #ex: /login/login-success/
     url(r'^login/login-success/$', views.login_success, name='login-success'),
 
-    # ex: gy3/login/
+    # ex: /login/
     url(r'^login/$', 'django.contrib.auth.views.login', {'template_name':'registration/login.html',
        'extra_context': 
        {
        'next':'login-success/'
-       },									}, name='home'),
+       },}, name='home'),
     
-    # ex: gy3/registration/registration-success/
+    # ex: /registration/registration-success/
     url(r'^registration/registration-success/$', views.registration_success, name='registration-success'),
 
-    # ex: gy3/login/registration/
+    # ex: /login/registration/
     url(r'^registration/$', views.registration, name='registration'),
 
-    # ex: gy3/change-password/change-success/
+    # ex: /change-password/change-success/
     url(r'^change-password/change-success/$', views.change_success, name='change_success'),
 
-    # ex: gy3/change-password/
+    # ex: /change-password/
     url(r'^change-password/$', 'django.contrib.auth.views.password_change', 
         {'template_name':'registration/password-change.html',
         'post_change_redirect':'change-success/',
-        }),
+        }, name='change_password'),
     
 
-    # ex: gy3/logout/
-    url(r'^logout/$', 'django.contrib.auth.views.logout', {'next_page':'logout-success/'}),
+    # ex: /logout/
+    url(r'^logout/$', 'django.contrib.auth.views.logout', {'next_page':'logout-success/'}, name='logout'),
 
-    # ex: gy3/logout/logout-success/
+    # ex: /logout/logout-success/
     url(r'^logout/logout-success/$', views.logout_redirect, name='login-redirect'),
 
 

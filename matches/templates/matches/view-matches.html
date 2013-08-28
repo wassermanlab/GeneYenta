@@ -23,53 +23,69 @@
 	<div class="col-lg-10 col-offset-1 col-12">
 
 {% if match_dict %}
-<ul>
 	{% for patient_id_key, match_list in match_dict.items %}
 	<li>
 		<h4 data-toggle="collapse" data-target="#list{{patient_id_key}}">
-			Matches for Patient #{{patient_id_key}}	
+			Matches for with GeneYenta ID: {{patient_id_key}}	
 			<small>
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 				New (<div class="notification">{{unread_dict|get_item:patient_id_key}}</div>)
-				Important(<div class="notification">X</div>)
+				Important(<div id="important-counter-{{patient_id_key}}" class="notification">{{important_dict|get_item:patient_id_key}}</div>)
 			</small>
 		</h4>
 	</li>
 
 
-	
 		<div id="list{{patient_id_key}}" class="collapse out">
-		
-			<table class="table table-condensed sortable">
+			<table class="sortable table table-condensed">
 				<thead>
 					<tr>
-						<td></td>
-						<td>Date Matched</td>
-						<td>Score</td>
+						<th>Important?</th>
+						<th></th>
+						<th>Date Matched</th>
+						<th>Your Notes</th>
+						<th>Score</th>
+						<th>Other Patient's ID.</th>
 					</tr>
 				</thead>
-			<tbody>
-			{% for m in match_list %}
-			<tr>
-				{# Asjdfkajshdfkajhsdkfjh #}
-				<td><a href="{% url 'matches.views.match_detail' m.id %}">More info</a></td>
+				<tbody>
+				{% for m in match_list %}
+					{% if m.is_read %}
+						<tr>
+					{% else %}
+						<tr class="unread">					
+					{% endif %}
 
-				<td><span>{{m.last_matched}}</span></td>
-				<td>
-				<span>{{m.score}}</span>
-				<a onmouseover='nhpup.popup("{{m.notes}}")' href="#">Hover to view notes</a>
-				</td>
-			</tr>
-				
-			{% endfor %}
-		</tbody>
-			</table>
-		
-		</div>
-		
+					{% if m.is_important %}
+					<td sorttable_customkey="1">
+					{% else %}	
+					<td sorttable_customkey="0">
+					{% endif %}	
 
+						<form name='mark-important-form' method="POST" sorttable_customkey="2"> 		{% if m.is_important %}
+								<input type="checkbox" onclick="async_post(this);" name="{{m.patient}}" value="{{m.id}}" checked/>	
+							{% else %}
+								<input type="checkbox" onclick="async_post(this);" name="{{m.patient}}" value="{{m.id}}"/>	
+							{% endif %}	
+						</form> 
+					
+					</td>
+
+					<td><a href="{% url 'matches.views.match_detail' m.id %}">More info</a></td>
+
+					<td>{{m.last_matched}}</td>
+					
+					<td>
+						<a onmouseover='nhpup.popup("{{m.notes}}")' href="#">Hover to view notes</a>
+					</td>
+					<td>{{m.score}}</td>
+					<td>{{m.matched_patient.id}}</td>
+				</tr>					
+				{% endfor %}
+				</tbody>
+		</table>	
+	</div>
 	{% endfor %}
-</ul>
 {% else %}
 	<h4>There are no matches to display for your active cases.</h4>
 	<h5>Please note, if a case has been archived, you will not receive notifications of any potential matches for that case.</br> After unarchiving this case, all potential matches will be visible.</h5> 
@@ -92,7 +108,37 @@
 
 
 {% block endbody %}
-<div class="endbody-padding"></div>
+
+<script type="text/javascript">
+	function async_post(input) {
+		var match_id = input.value;
+		var patient = input.name;
+		var is_important = $(input).is(":checked");
+		$.ajax({
+                 type:"POST",
+                 url:"",
+                 data: {
+                 		'patient': patient,
+             			'status': is_important,
+                       	'match_id': match_id,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}',
+                        },
+                 success: function(){
+                    //alert('success' + match_id + is_important);
+                    //alert('Patient ID: '+patient);
+                    var counter_id = '#important-counter-'+patient;
+	            	var n_important = $( "input[name="+patient+"]:checked" ).length;
+	            	//alert("n_important:"+n_important);
+	            	//alert($(id).text());
+	    			$(counter_id).text(n_important);
+                 }
+            });
+            return false;
+			//set the custom key attribute to the appropriate value by calling get parentx2
+
+	}
+</script>
+
 <script type="text/javascript" src="{{STATIC_URL}}cases/js/popup.js"></script>
 <script src="{{STATIC_URL}}cases/js/sorttable.js"></script>
 {% endblock %}

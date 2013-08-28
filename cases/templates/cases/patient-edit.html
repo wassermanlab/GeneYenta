@@ -7,18 +7,77 @@
 
 {% block content %}
 
-{% ssi '/apps/GeneYenta/cases/static/cases/dynatree/dev/FullTree.html' parsed %}
 
 
+<div class="row">
+    <div class="col-offset-1 col-lg-11">
+<h3> Patient with GeneYenta ID: {{patient.id}} (Private ID:{{patient.private_id}}) </h3>
+    </div>
+</div>
 
-<h2> Patient System ID Number: {{patient.id}} </h2>
+<div class="row">
+    <div class="col-offset-1 col-lg-11">
 <form name='patient-form' id="form" method="POST">
-        {% csrf_token %}
-        <div id='json'>{{form.json}}</div>
-        {{form.as_p}}
-        
-        <input type="submit" value="Submit"/>
+    {% csrf_token %}
+                {{form.json}}
+          <div class="row">
+                <div class="col-lg-6 col-12">
+                    <dl class="">
+                        <dt> Private Identifier</br>
+                            <small>This is a confidential identifier used to reference a patient's medical records (e.g. a chart number or medical file number). It is for your personal organization only. 
+                            </small>
+                        </dt>
+                        <dd>{{form.private_id}}</dd>
+                        <dt>Case Summary</br>
+                            <small>Please provide a detailed set of clinical observations and any other details that you find relevant in describing this case.
+                            </small> 
+                        </dt>
+                        <dd>{{form.case_summary}}</dd>
+                    </dl>
+                </div>
+
+                <div class="col-lg-6 col-12">
+                    <dl class="">
+                        <dt>Institute</br>
+                            <small>
+                                The institute that the patient is associated with.
+                            </small>
+                        </dt>
+                        <dd>{{form.institute}}</dd>
+                        <dt>Clinic</br>
+                            <small> 
+                                The clinic where the patient's records are stored. 
+                            </small>
+                        </dt>
+                        <dd>{{form.clinic}}</dd>
+                    </br>    
+                        <dt>Month and Year of Patient's First Appointment</dt>
+                        <dd>{{form.first_appointment_month}}{{form.first_appointment_year}}</dd>
+                    </br>
+                        <dt> Patient's Age at First Appointment </dt>
+                        <dd>{{form.first_appointment_age}}</dd>
+                    </br>
+                        <dt>Patient's Gender</dt>
+                            <dd>{{form.gender}}</dd>
+                    </dl>
+                </div>
+            </div>
+                
+
+{% ssi '/apps/GeneYenta/static/cases/dynatree/dev/hpo-tree.html' parsed %}
+<input class="btn btn-default" type="submit" value="Submit Changes"/>
+
 </form>
+  </div>
+</div>
+
+
+<div class="row">
+    <div class="col-offset-1 col-lg-11">
+
+
+  </div>
+</div>
 
 
 <script type="text/javascript">
