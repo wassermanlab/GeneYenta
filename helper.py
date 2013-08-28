@@ -1,3 +1,9 @@
+# helper.py
+# Ultimately, this custom module should be placed in a different place.
+# Originally, I had more functions defined in this file, but as we refactored
+# some of the application code, I ended up moving a lot of these functions
+# to the appropriate views.py files.
+
 from django.shortcuts import render
 #import json
 #from cases.models import Phenotype
@@ -9,8 +15,8 @@ from django.shortcuts import render
 # This is the constant value supplied to all login_required function decorators
 # If the user is not authenticated (therefore failing the decorator test); 
 # they will be redirected to this address
-LOGIN_REQUIRED_URL = '/geneyenta/accounts/login/'
-
+LOGIN_REQUIRED_URL = '/accounts/login/'
+#This could be placed in settings.py (may be useful to add a single underscore to stop any collisions)
 
 
 
