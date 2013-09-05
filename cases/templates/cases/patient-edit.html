@@ -82,22 +82,22 @@
 
 <script type="text/javascript">
 
+
+//renders all the previously selected phenotypes as a set of radio buttons and dynatree selections
 $(document).ready(function (){
-//alert('hello');
-var old_phenotypes = {{old_json|safe}};
-// var obj = JSON.parse(old_phenotypes);
+var old_phenotypes = {{old_json|safe}}; //double-check of "|safe" filter usage
+// var obj = JSON.parse(old_phenotypes); //believed to be unecessary
 for (var hpo_id in old_phenotypes) {
-	//alert(hpo_id);
-	//alert(old_phenotypes[index]);
 	$("#tree").dynatree("getTree").selectKey(hpo_id, true);
 	selectAllWithID(hpo_id, true);
 	var identifier = 'importance'+hpo_id;
-	//alert(identifier);
 	$('input:radio[name=importance'+hpo_id+'][value='+old_phenotypes[hpo_id]+']').prop('checked', true);
 }
 });
 
 
+//TODO: replace the following old validation code for phenotype selections with newer code
+//found in create-case.html
 $('#form').submit(function(evt) {
 	var terms = new Array();
 	$( ".selected" ).each(function( index ) {
@@ -116,7 +116,6 @@ $('#form').submit(function(evt) {
 
 	});  
 	var result = JSON.stringify(terms);
-    //alert(result);
 	$('#id_json').val(result);//sets the value of the hidden element to the json-string
 });
 

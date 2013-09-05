@@ -100,6 +100,14 @@
 
 <script type="text/javascript">
 
+	/* function: htmlForTextWithEmbeddedNewlines
+                This function escapes the newline characters in the generated error text
+                and adds the appropriate newline character that will be rendered correctly
+                 in the html.
+          Source:
+            http://stackoverflow.com/questions/4535888/jquery-text-and-newlines
+            http://stackoverflow.com/questions/268490/
+        */
     function htmlForTextWithEmbeddedNewlines(text) {
                 var htmls = [];
                 var lines = text.split(/\n/);
@@ -111,13 +119,18 @@
             }
 
 
-    $('#form').submit(function(evt) {
+    $('#form').submit(function(evt) { //called on form submission
         
-        var fail_validation = false;
+        var fail_validation = false; //whether or not the form passes the validation procedure
         var phenotype_errors ='You have not selected an importance rating for:\n';
-    	var terms = new Array();
+    	var terms = new Array(); //An array of the selected phenotypes
     	
-        $( ".selected" ).each(function( index ) {
+	//iterates through selected phenotpe ( DOM elements with .selected)
+	//checks whether the user has selected an importance rating for each
+	//adds each term to an array
+	//serializes the data
+	//attaches it to a hidden field on the form
+        $( ".selected" ).each(function( index ) { 
      		var single_term = new Object();
      		
      		//captures the hpo id 
@@ -134,21 +147,18 @@
                 single_term.importance = radio.val();
                 terms.push(single_term);//adds its to the array
             } else {
-                //alert('You have not selected an importance rating for: \"'+single_term.description+'\".');
                 phenotype_errors += single_term.description +'\n';
                 fail_validation = true;
                 evt.preventDefault();
             }
         });  
 
-        if (fail_validation) {
+        if (fail_validation) {//display alerts to user
             $("#phenotype-fields-missing-text").html(htmlForTextWithEmbeddedNewlines(phenotype_errors));
             $("#phenotype-fields-missing-warning").show();
         } else {
-        	var result = JSON.stringify(terms);
-        	//alert(result);
-        	$('#id_patient-json').val(result);//sets the value of the hidden element to the json-string
-        	//alert($('#id_patient-json').val());
+            var result = JSON.stringify(terms);
+            $('#id_patient-json').val(result);//sets the value of the hidden element to the json-string
         }
 
     });
@@ -197,10 +207,15 @@
     }], function(errors, event) {
         if (errors.length > 0) {
 
-
-            //http://stackoverflow.com/questions/4535888/jquery-text-and-newlines
-            // http://stackoverflow.com/questions/268490/
-            function htmlForTextWithEmbeddedNewlines(text) {
+        /* function: htmlForTextWithEmbeddedNewlines
+                This function escapes the newline characters in the generated error text
+                and adds the appropriate newline character that will be rendered correctly
+                 in the html.
+          Source:
+            http://stackoverflow.com/questions/4535888/jquery-text-and-newlines
+            http://stackoverflow.com/questions/268490/
+        */    
+	function htmlForTextWithEmbeddedNewlines(text) {
                 var htmls = [];
                 var lines = text.split(/\n/);
                 var tmpDiv = jQuery(document.createElement('div'));

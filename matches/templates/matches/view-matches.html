@@ -93,14 +93,6 @@
 </div>
 {% endif %}
 
-<!--
-<button type="button" class="btn btn-danger" data-toggle="collapse" data-target="#demo">
-  simple collapsible
-</button>
-
-<div id="demo" class="collapse in">herro</div>
--->
-
 
 {% endblock %}
 
@@ -110,9 +102,14 @@
 {% block endbody %}
 
 <script type="text/javascript">
+	/* Function: async_post
+		Upon clicking the checkbox, a given match
+	notification is marked as important by submitting an ajax POST request to
+	the server that updates the DB models without refreshing the page.
+	*/
 	function async_post(input) {
-		var match_id = input.value;
-		var patient = input.name;
+		var match_id = input.value; //GeneYenta ID AKA the match's primary key
+		var patient = input.name;  //the patient's GeneYenta/System ID 
 		var is_important = $(input).is(":checked");
 		$.ajax({
                  type:"POST",
@@ -124,17 +121,13 @@
                         'csrfmiddlewaretoken': '{{ csrf_token }}',
                         },
                  success: function(){
-                    //alert('success' + match_id + is_important);
-                    //alert('Patient ID: '+patient);
                     var counter_id = '#important-counter-'+patient;
 	            	var n_important = $( "input[name="+patient+"]:checked" ).length;
-	            	//alert("n_important:"+n_important);
-	            	//alert($(id).text());
 	    			$(counter_id).text(n_important);
                  }
             });
             return false;
-			//set the custom key attribute to the appropriate value by calling get parentx2
+	//TODO: set the custom key attribute to the appropriate value by calling get parentx2
 
 	}
 </script>
