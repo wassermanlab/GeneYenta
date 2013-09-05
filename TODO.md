@@ -123,6 +123,9 @@
 
 ### Section 8 --- Interface: Viewing/Creating Cases ####
 
+	+ Replace/improve the validation JS code in edit-case.html
+		Use the code from create-cases.html and you may only have to add a hidden alert or similar DOM element.
+
 	++ Investigate safety of using a hidden field to submit JSON phenotype inforamtion
 
 	++ Investigate why there is strange string processing required to decode the JSON Phenotype data
