@@ -7,6 +7,8 @@
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
+MATCH_BINARY = '/apps/GeneYenta/match.py'
+
 ######### For chron jobs i.e. matching ###
 import djcelery
 djcelery.setup_loader()
@@ -139,6 +141,8 @@ INSTALLED_APPS = (
     'django_extensions',
     'cases',
     'djcelery',
+    # temp. app for testing celery
+    #'celerytest',
     'kombu.transport.django',
     'matches',
 )
