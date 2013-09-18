@@ -8,7 +8,7 @@ from django.core.urlresolvers import reverse
 # Model Imports
 from django.contrib.auth.models import User
 from registration.models import Clinician
-from registration.models import ClincianForm
+from registration.models import ClinicianForm
 from registration.models import UserForm
 
 # Authentication Imports
@@ -51,7 +51,7 @@ def registration(request):
 			userprofile = clinician_form.save(commit=False)
 			userprofile.user = user
 			userprofile.save()
-			message = 'Hello, You have registered for GeneYenta. 
+			message = 'Hello, You have registered for GeneYenta. \
 			You will be notified when your account has been approved.'
 			subject = 'Confirmation of GeneYenta Registration'
 			try:
