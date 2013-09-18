@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/local/bin/python2.7
 """
 match.py
 
@@ -47,7 +47,12 @@ TO DO
 import math
 import argparse
 import MySQLdb
+import smtplib
+import time
+import logging
+
 from datetime import tzinfo, timedelta, datetime
+from email.mime.text import MIMEText
 
 # Maybe these should be passed in as command line arguments
 GY_DB_HOST = 'localhost'
@@ -56,6 +61,16 @@ GY_DB_PASS = 'gnytdmpw'
 GY_DB_NAME = 'GeneYenta'
 
 NO_MATCH = -1
+PROCESS_RETRIES = 10    # number of times to try match processing
+PROCESS_WAIT_TIME = 60  # number of seconds to wait between each
+                        # match processing attempt
+LOG_FILE = '/apps/GeneYenta/logs/match_process.log'
+
+# XXX set up gyadmin e-mail and update
+ADMIN_EMAIL = 'dave@cmmt.ubc.ca'
+
+
+logging.basicConfig(filename=LOG_FILE, level=logging.INFO)
 
 class Match:
     """
@@ -135,6 +150,16 @@ class PhenoTerm:
             self.id, self.term_score, self.clinician_score
         )
 
+class MatchProcess:
+    def __init__(self, is_processing, start_date, end_date):
+        # boolean indicating processing is in progress
+        self.processing = is_processing
+
+        # start datetime of match processing
+        self.process_started = start_date
+
+        # finish datetime of match processing
+        self.process_finished = end_date
 
 class GYMatcher:
     """
@@ -155,6 +180,51 @@ class GYMatcher:
 
         self.new_matches = []
         self.updated_matches = []
+
+    def isMatchProcessing(self):
+        """
+        Check if a match process is currently in progress by fetching
+        the processing field of the match_process record.
+        Returns a boolean.
+
+        """
+
+        sql = "SELECT processing FROM match_process"
+        cur = self.db.cursor()
+        cur.execute(sql)
+        row = cur.fetchone()
+
+        return row[0]
+
+    def setMatchProcessStarted(self):
+        """
+        Update the match_process record to indicate a match process has
+        started.
+
+        """
+
+        # Note we are using local time as opposed to UTC time as this is for
+        # administration/logging purposes and not accessed by the Django
+        # interface.
+        sql = "UPDATE match_process set processing = True, " \
+              "process_started = '{0}', process_finished = NULL".format(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        cur = self.db.cursor()
+        cur.execute(sql)
+
+    def setMatchProcessFinished(self):
+        """
+        Update the match_process record to indicate a match process has
+        finished.
+
+        """
+
+        # Note we are using local time as opposed to UTC time as this is for
+        # administration/logging purposes and not accessed by the Django
+        # interface.
+        sql = "UPDATE match_process set processing = False, " \
+              "process_finished = '{0}'".format(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        cur = self.db.cursor()
+        cur.execute(sql)
 
     def fetchPatient(self, patient_id):
         """
@@ -320,7 +390,8 @@ class GYMatcher:
 
         """
 
-        print "Inserting new match {0}".format(match)
+        #print "Inserting new match {0}".format(match)
+        logging.info("Inserting new match {0}".format(match))
         sql = "INSERT INTO matches_match " \
               "(patient_id, matched_patient_id, is_read, is_important, " \
               "score, last_matched, notes) " \
@@ -343,7 +414,8 @@ class GYMatcher:
 
         """
 
-        print "Updating match {0}".format(match)
+        #print "Updating match {0}".format(match)
+        logging.info("Updating match {0}".format(match))
         sql = "UPDATE matches_match SET score = {0}, " \
               "is_read = FALSE, last_matched = '{1}' " \
               "WHERE id = {2:d}".format(
@@ -410,8 +482,13 @@ class GYMatcher:
             self.fetchPatientPhenoTerms(patient1)
 
         if not patient1.terms:
-            print "Patient {0} has no phenotype terms associated".format(
-                patient1.id
+            #print "Patient {0} has no phenotype terms associated".format(
+            #    patient1.id
+            #)
+            logging.warning(
+                "Patient {0} has no phenotype terms associated".format(
+                    patient1.id
+                )
             )
             return 0
 
@@ -419,8 +496,13 @@ class GYMatcher:
             self.fetchPatientPhenoTerms(patient2)
 
         if not patient2.terms:
-            print "Patient {0} has no phenotype terms associated".format(
-                patient2.id
+            #print "Patient {0} has no phenotype terms associated".format(
+            #    patient2.id
+            #)
+            logging.warning(
+                "Patient {0} has no phenotype terms associated".format(
+                    patient2.id
+                )
             )
             return 0
 
@@ -449,7 +531,8 @@ class GYMatcher:
                 )
             else:
                 # This should not happen
-                print "WARNING: term {0} not matched!!!".format(p1_term)
+                #print "WARNING: term {0} not matched!!!".format(p1_term)
+                logging.error("term {0} not matched!!!".format(p1_term))
 
         #print "match numerator {0}".format(matchNumerator)
         #print "match denominator {0}".format(matchDenominator)
@@ -518,12 +601,17 @@ class GYMatcher:
             )
 
             if is_up_to_date_match:
-                print "Existing match {0} is up to date".format(existing_match)
+                #print "Existing match {0} is up to date".format(existing_match)
+                logging.info("Existing match {0} is up to date".format(
+                    existing_match
+                ))
             else:
                 score = self.getPatientMatchPercent(patient1, patient2)
 
                 # Update match with new score. Set the is_read flag to false
-                # and update the date to current (UTC) time.
+                # and update the date to current time.
+                # Note we use UTC time to be consistent with the Django
+                # interface.
                 existing_match.score = score
                 existing_match.is_read = False
                 existing_match.last_matched = datetime.utcnow()
@@ -535,6 +623,8 @@ class GYMatcher:
 
             # Note: giving new_match a dummy id of 0. The id is an
             # auto-increment field which will be updated by the SQL server.
+            # Note we use UTC time to be consistent with the Django
+            # interface.
             new_match = Match(
                 0, patient1.id, patient2.id, False, False, score,
                 datetime.utcnow(), ''
@@ -581,6 +671,15 @@ class GYMatcher:
                         self.matchPatientToPatient(patient1, patient2)
                         self.matchPatientToPatient(patient2, patient1)
 
+    def notifyMatchProcessTimedOut(self):
+        msg = MIMEText("A GeneYenta matching process timed out waiting for a previous matching process to complete at {0}".format(datetime.now()))
+        msg['Subject'] = 'GeneYenta matching process failed'
+        msg['From'] = ADMIN_EMAIL
+        msg['To'] = ADMIN_EMAIL
+        s = smtplib.SMTP('localhost')
+        s.sendmail(ADMIN_EMAIL, [ADMIN_EMAIL], msg.as_string())
+        s.quit()
+
 
 def main():
     """
@@ -589,6 +688,8 @@ def main():
     patients.
 
     """
+
+    logging.info("matching process started at {0}".format(datetime.now()))
 
     parser = argparse.ArgumentParser(
         description = 'Match patient phenotypes in the GeneYenta DB. If a patient ID is provided, match that patient to all other patients, otherwise match all patients to all other patients.'
@@ -599,12 +700,32 @@ def main():
     patient_id = args.patient_id
 
     m = GYMatcher()
+    
+    process_attempts = 0
+    existing_process = m.isMatchProcessing()
+    while existing_process and process_attempts < PROCESS_RETRIES:
+        process_attempts += 1
+        time.sleep(PROCESS_WAIT_TIME)
+        existing_process = m.isMatchProcessing()
 
-    if patient_id:
-        patient = m.fetchPatient(patient_id)
-        m.matchPatientToAll(patient)
+    if existing_process:
+            logging.error(
+                "matching process timed out waiting for a previous matching " \
+                "process to complete at {0}".format(datetime.now()))
+            m.notifyMatchProcessTimedOut()
     else:
-        m.matchAllPatients()
+        m.setMatchProcessStarted()
+
+        if patient_id:
+            patient = m.fetchPatient(patient_id)
+            m.matchPatientToAll(patient)
+        else:
+            m.matchAllPatients()
+
+        m.setMatchProcessFinished()
+
+        logging.info("matching process completed at {0}".format(datetime.now()))
+
 
 if __name__ == "__main__":
     main()
