@@ -58,8 +58,8 @@ class ClinicianForm(ModelForm):
 @receiver(pre_save, sender=User)
 def activation_handler(sender, instance, **kwargs):
 	subject = 'GeneYenta Account Activation'
-	message = 'Your account has been activated for use by
-	a GeneYenta administrator, and you are now able to start adding
+	message = 'Your account has been activated for use by \
+	a GeneYenta administrator, and you are now able to start adding \
 	cases to the system and finding matches.'
 	try:
 		original = User.objects.get(pk=instance.pk)
@@ -77,7 +77,7 @@ def activation_handler(sender, instance, **kwargs):
 @receiver(pre_save, sender=User)
 def password_change_handler(sender, instance, **kwargs):
 	subject = 'GeneYenta Password Change'
-	message = 'Your password has been changed. If you believe that your security has
+	message = 'Your password has been changed. If you believe that your security has \
 	been compromised, please send an email to root@geneyenta.cmmt.ubc.ca'
 	try:
 		original = User.objects.get(pk=instance.pk)
