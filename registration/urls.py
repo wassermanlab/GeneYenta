@@ -10,6 +10,7 @@ from registration import views
 urlpatterns = patterns('',
 
 	#ex: /	
+	url('', views.home, name='home'),
     url(r'^$', views.home_redirect, name='home_redirect'),
 
 	 #ex: /login/login-success/

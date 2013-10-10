@@ -9,7 +9,7 @@ urlpatterns = patterns('',
     # url(r'^$', 'geneyenta.views.home', name='home'),
     # url(r'^geneyenta/', include('geneyenta.foo.urls')),
     # url(r'^login/', include('registration.urls')),
-
+	url('', include('registration.urls')),
     url(r'^$', include ('registration.urls')),
     url(r'^accounts/', include('registration.urls')),
     url(r'^cases/', include('cases.urls')),
