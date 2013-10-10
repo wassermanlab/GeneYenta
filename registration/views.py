@@ -34,7 +34,7 @@ def home_redirect(request):
 	if request.user.is_authenticated():
 		return HttpResponseRedirect('matches/view-matches')
 	else:
-		return HttpResponse('accounts/home')
+		return HttpResponseRedirect('accounts/home')
 
 # View: registraion
 # Allows the user to create an INACTIVE User account and user profile (a Clinician instance)
