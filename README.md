@@ -15,12 +15,12 @@
 
 // To jump to a chapter search "Section [section number]"
 
-
+ 
 ### Section 1 -- Overview of the application ###
 
 GeneYenta is an online case-matching tool that runs off Django, a python-based, open source framework (see https://www.djangoproject.com/). Django is actively maintained and there is a strong user community the two primary resources are the official documentation and the StackOverflow website.
 		
-Although the documentation for Django is quite thorough, I will provide a brief introductionto the API's structure:
+Although the documentation for Django is quite thorough, I will provide a brief introduction to the API's structure:
 
 + A Django project is composed of multiple different "apps"
 
@@ -38,7 +38,7 @@ NOTE: Some of the inidivudal Model fields attributes (expressed as kwarg paramet
 for presentation in the templates. There are some built-in/contributed views provided by Django. One example is the authentication package, which takes care of the logic around authenticating and registering user accounts.  The view functions are called whenever a user visits a particular url.
 
 === A Brief Note on Urls ===
-URLs are the means through which an app's functionality is called into use. It starts in the urls.py file in the root-folder. This is known as the URL-conf. When a user tries to visit a certain url, a portion of it will be evaluated by the URL-conf. Then based on the regular expression matches found in that file, Django will pass the remainder of the url to the appropriate urls.py file in the appropriate application. Then, another set of regex's are matched to by the application. If a match is found, the url function will call a view function. In this way, the urls are the "glue" between the user's urls visitations and calling up a page. This was a brief description and the process is well explained in the Django docs (https://docs.djangoproject.com/en/dev/topics/http/urls/).
+URLs are the means through which an app's functionality is called into use. It starts in the urls.py file in the root-folder. This is known as the URL-conf. When a user tries to visit a certain url, a portion of it will be evaluated by the URL-conf. Then based on the regular expression matches found in that file, Django will pass the remainder of the url to the appropriate urls.py file in the appropriate application. Then, another set of regex's are matched to by the application. If a match is found, the url function will call a view function. In this way, the urls are the "glue" between the user's urls visitations and calling up a page. This was a brief description and the process is well explained in the Django docs (https://docs.djangoproject.com/en/dev/topics/http/urls/ ).
 === end ===
 
 So, the view functions are called based on when a user visits a url. When data is retrieved from the database, everything is converted into a python object and can be manipulated as such. 
@@ -198,9 +198,10 @@ JS DOM manipulation library.
 
 + Dynatree
 
+
 @TODO
 Contact Mike Gottlieb.
-
+https://code.google.com/p/dynatree/
 Used for navigating the HPO.
 
 
