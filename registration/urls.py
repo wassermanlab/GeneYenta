@@ -44,7 +44,6 @@ urlpatterns = patterns('',
     # ex: /logout/logout-success/
     url(r'^logout/logout-success/$', views.logout_redirect, name='login-redirect'),
 
-
 # The following 3 url configs seem to work; but use the default admin templates
 # Requires proper set up of STMP mail servers
 # (r'^password_reset/$', 'django.contrib.auth.views.password_reset'),

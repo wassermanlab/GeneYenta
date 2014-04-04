@@ -91,3 +91,19 @@ def change_success(request):
 # After loggin out, the user is redirected to the homepage
 def logout_redirect(request):
 	return HttpResponseRedirect(reverse('home'))
+
+def send_file(request):
+	import os, tempfile, zipfile
+	from django.core.servers.basehttp import FileWrapper
+	from django.conf import settings
+	from django.http import HttpResponse
+	import mimetypes
+
+	filename = "/space/apps/GeneYenta/media/GeneYenta.txt"
+	download_name = "GeneYenta.txt"
+	wrapper = FileWrapper(open(filename))
+	content_type = mimetypes.guess_type(filename)[0]
+	response = HttpResponse(wrapper, content_type=content_type)
+	response['Content-Length'] = os.path.getsize(filename)
+	response['Content-Disposition'] = "attachment; filename=%s"%download_name
+	return response
