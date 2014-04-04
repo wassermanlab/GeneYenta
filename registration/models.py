@@ -44,9 +44,13 @@ class UserForm(ModelForm):
 		fields = ['username', 'password', 'email']
 		widgets = {'password': forms.PasswordInput(),} #hides user password input
     
-class ClinicianForm(ModelForm):
-    class Meta:
-        model = Clinician
+class ClinicianForm(forms.ModelForm):
+	def __init__(self, *args, **kwargs):
+		super(ClinicianForm, self).__init__(*args, **kwargs)
+		self.fields['description'].label='Research Summary'
+    
+	class Meta:
+		model = Clinician
     	exclude = ['user']
 
 
