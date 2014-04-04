@@ -208,7 +208,8 @@ Used for navigating the HPO.
 
 A task scheduler will be needed to run the match.py code whenever it is appropriate.
 
-Dave A. is looking into that now
+Dave A. is looking into that now:
+Celery has been proposed to handle this task. Another (simpler?) possibility is to simply have a table with a single record in the DB with a match update flag field and possibly some date and match type (all patients or single patient match) fields. The matching program will check if this flag is set and if not, set the flag and proceed with the matching. When the matching is complete, the match program will clear the flag (and update the data fields with the start/end date/time of the matching process). If this is done the match program will have to have some sort of retry loop and time out after some period if the flag remains set. In this case an e-mail notification will need to be sent to the GY administrator to inform them of a possible problem (the last match process failed to finish and did not clear the flag). This may get more complicated in which case Celery might be the way to go.
 
 @TODO: write docs
 
@@ -262,6 +263,9 @@ Zach Maurer -- Worked on the project full-time from Jul. 2013 - Sept. 2013
 Email1: zach.maurer@gmail.com
 Email2: zmaurer@stanford.edu
 Skype: zach.daniel.maurer
+
+David Arenillas -- Working on project since Jul. 2013
+Email: dave@cmmt.ubc.ca
 
 @TODO: Fill in other contact info's
 

@@ -9,8 +9,7 @@ from registration import views
 # All these urls have been already truncated by the URL-Conf in geneyenta.urls
 urlpatterns = patterns('',
 
-	#ex: /	
-	url('', views.home, name='home'),
+	#ex: /		
     url(r'^$', views.home_redirect, name='home_redirect'),
 
 	 #ex: /login/login-success/

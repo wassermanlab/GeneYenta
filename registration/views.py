@@ -28,8 +28,7 @@ from helper import LOGIN_REQUIRED_URL
 # [view description]
 
 
-def home(request):
-	return Render(request, 'registration/home.html')
+
 # View: home_redirect
 # If the user is authenticated, then the user is redirected to the inbox.
 # If not, the user is redirected to the login page.

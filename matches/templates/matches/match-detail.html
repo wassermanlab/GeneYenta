@@ -23,7 +23,7 @@
 			<h4>Matched Clinician's Contact Info.</h4>
 			<dl class="dl-horizontal">
 	  			<dt>Name: </dt>
-	  			<dd>{{other_user.name}}</dd>
+	  			<dd>{{other_user.salutation}} {{other_user.first_name}} {{other_user.last_name}}</dd>
 	  			<dt>Email:</dt>
 	  			<dd>{{other_user.email}}</dd>
 	  			<dt>Institute:</dt>
@@ -73,7 +73,7 @@
 	                <tr>
 	                  	<th>Description</th>
 	                  	<th>Your Importance Rating</th>
-	                	<th>{{other_user.name}}'s Importance Rating</th>
+	                	<th>{{other_user.salutation}} {{other_user.first_name}} {{other_user.last_name}}'s Importance Rating</th>
 	            	 </tr>
 	          	</thead>
 			{% for p in phenotypes %}

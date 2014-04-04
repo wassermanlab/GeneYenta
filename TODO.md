@@ -156,6 +156,9 @@
     to just archiving) if for example they enter a case erroneously? Would also
     have to delete all matches for this case.
 
+    + Does the settings view belong here? Maybe there should be a separate
+      settings app or a clinician app with a settings view?
+
 ### Section 9 --- Interface: Matches ###
 
 	+ Update sorttable_customkey attribute to change when user flags a match as important
@@ -235,6 +238,14 @@
 
 	+ Double-check the current usages of the '|safe' template filter.
 		Not sure if used appropriately.
+
+    + Make sure indentation is consistently spaces (no tabs)
+
+    + Add finished GeneYenta website to djangosites.org?
+
+    + Remove debugging print statements from code
+
+    + Turn off DEBUG mode
 
 
 

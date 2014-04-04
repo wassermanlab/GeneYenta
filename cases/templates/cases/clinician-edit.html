@@ -24,8 +24,12 @@
 	<div class="col-lg-6 col-12">
 		<dl>
 			<h4>Personal Information</h4>
-			<dt>Name:</dt>
-			<dd>{{form.name}}</dd>
+			<dt>Salutation:</dt>
+			<dd>{{form.salutation}}</dd>
+			<dt>First Name:</dt>
+			<dd>{{form.first_name}}</dd>
+			<dt>Last Name:</dt>
+			<dd>{{form.last_name}}</dd>
 		</br>
 			<dt>Email:<br><small>Please make sure that this address is valid.</br> All notifications from GeneYenta will be sent to this address.</small></dt>
 			<dd>{{form.email}}</dd>
@@ -106,8 +110,15 @@ function htmlForTextWithEmbeddedNewlines(text) {
 
 //validate.js code
 var validator = new FormValidator('form', [{
-        name: 'name',
-        display: '\"Name\"',
+        name: 'salutation',
+        display: '\"Salutation\"',
+    }, {
+        name: 'first_name',
+        display: '\"First Name\"',
+        rules: 'required',
+    }, {
+        name: 'last_name',
+        display: '\"Last Name\"',
         rules: 'required',
     }, {
         name: 'email',
@@ -132,7 +143,6 @@ var validator = new FormValidator('form', [{
     }, {
         name: 'address2',
         display: '\"Address Line 2 (use "n/a" if not needed)\"',
-        rules: 'required',
     }, {
     	name: 'city',
     	display: '\"City\"',

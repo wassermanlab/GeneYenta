@@ -20,9 +20,11 @@ from geneyenta.settings import EMAIL_HOST_USER
 # associated with a given User
 class Clinician(models.Model):
 	user = models.OneToOneField(User)
-	name = models.CharField(max_length=100)
+	salutation = models.CharField(max_length=10)
+	first_name = models.CharField(max_length=30)
+	last_name = models.CharField(max_length=30)
 	phone = models.CharField(max_length=32)
-	email = models.CharField(max_length=100)
+	email = models.CharField(max_length=75)
 	institute = models.CharField(max_length=100)
 	address1 = models.CharField(max_length=100)
 	address2 = models.CharField(max_length=100)
@@ -32,7 +34,7 @@ class Clinician(models.Model):
 	description = models.TextField(max_length=2500)
 
 	def __unicode__(self):
-		return self.name
+		return '{0} {1} {2}'.format(self.salutation, self.first_name, self.last_name)
 
 # Form Classes
 
