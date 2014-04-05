@@ -51,6 +51,9 @@ class ClinicianForm(forms.ModelForm):
 	def __init__(self, *args, **kwargs):
 		super(ClinicianForm, self).__init__(*args, **kwargs)
 		self.fields['description'].label='Research Summary'
+		for key in self.fields:
+			if key != 'description' and key != 'address2':
+				self.fields[key].label = self.fields[key].label + '*'
     
 	class Meta:
 		model = Clinician
