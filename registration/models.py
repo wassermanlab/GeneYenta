@@ -14,6 +14,12 @@ from django.core.mail import send_mail
 from geneyenta.settings import EMAIL_HOST_USER
 
 from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
+
+def validate_email_unique(value):
+	user_exists = User.objects.filter(email=value)
+	if user_exists:
+		raise ValidationError("User with this email already exists")
 
 # Model Classes
 
@@ -40,7 +46,9 @@ class Clinician(models.Model):
 
 # Form Classes
 
-class UserForm(ModelForm):
+class UserForm(forms.ModelForm):
+	email = forms.CharField(required=True, validators=[validate_email_unique])
+	
 	class Meta:
 		model = User
 		fields = ['username', 'password', 'email']
