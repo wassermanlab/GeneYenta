@@ -13,6 +13,8 @@ from django.dispatch import receiver
 from django.core.mail import send_mail
 from geneyenta.settings import EMAIL_HOST_USER
 
+from django.core.validators import validate_email
+
 # Model Classes
 
 # Class: Clincian
@@ -24,7 +26,7 @@ class Clinician(models.Model):
 	first_name = models.CharField(max_length=30)
 	last_name = models.CharField(max_length=30)
 	phone = models.CharField(max_length=32)
-	email = models.CharField(max_length=75)
+	email = models.CharField(max_length=75, unique=True)
 	institute = models.CharField(max_length=100)
 	address1 = models.CharField(max_length=100)
 	address2 = models.CharField(max_length=100)
@@ -47,13 +49,15 @@ class UserForm(ModelForm):
 class ClinicianForm(forms.ModelForm):
 	address2 = forms.CharField(required=False)
 	description = forms.CharField(widget=forms.Textarea,max_length=2500, required=False)
+	email = forms.CharField(validators=[validate_email],
+							error_messages={'invalid': ('Enter a valid email address.')})
 	
 	def __init__(self, *args, **kwargs):
 		super(ClinicianForm, self).__init__(*args, **kwargs)
 		self.fields['description'].label='Research Summary'
-		self.fields.pop('user', None)
+		del self.fields['user']
 		for key in self.fields:
-			if key != 'description' and key != 'address2' and key != 'user':
+			if key != 'description' and key != 'address2' and key != 'user' and key!='email':
 				self.fields[key].label = self.fields[key].label + '*'
     
 	class Meta:

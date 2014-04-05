@@ -2,10 +2,7 @@
 *.bak
 *.swp
 *.old
-.DS_Store
-geneyenta/wsgi.daemon-test.py
-geneyenta/wsgi.multithread-test.py
 geneyenta/settings.py
-geneyenta/wsgi.py
+.DS_Store
 .project
 .pydevproject
