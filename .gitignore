@@ -7,3 +7,5 @@ geneyenta/wsgi.daemon-test.py
 geneyenta/wsgi.multithread-test.py
 geneyenta/settings.py
 geneyenta/wsgi.py
+.project
+.pydevproject
