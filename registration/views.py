@@ -1,7 +1,7 @@
 # registration -- views.py
 
 # Url and HTTP response Imports
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, render_to_response
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 
@@ -73,6 +73,11 @@ def registration(request):
 # Returns a basic screen indicating registration success and how the user should proceed
 def registration_success(request):
 	return render(request, 'registration/registration-success.html', )
+
+# View: contact_us
+def contact_us(request):
+	return render(request, 'registration/contact_us.html', {})
+
 
 # View: login_success
 # After a user successfully logs in to the system they are automatically

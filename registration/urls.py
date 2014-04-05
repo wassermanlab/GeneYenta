@@ -27,6 +27,8 @@ urlpatterns = patterns('',
 
     # ex: /login/registration/
     url(r'^registration/$', views.registration, name='registration'),
+    
+    url(r'^contact_us/$', views.contact_us, name='contact_us'),
 
     # ex: /change-password/change-success/
     url(r'^change-password/change-success/$', views.change_success, name='change_success'),
