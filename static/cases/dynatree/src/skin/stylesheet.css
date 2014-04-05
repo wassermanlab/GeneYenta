@@ -1,0 +1,63 @@
+
+
+.selected{
+height: 22px;
+width:500px;
+}
+
+.container{
+width: 925px; 
+ padding:10px;
+}
+
+.treeContainer{
+width:400px; 
+height:350px;
+ float:left;
+ }
+
+.selectedItemListContainer{
+width:525px; 
+height:350px;
+ float:right;
+ 
+ }
+ 
+ .minus{
+position:relative;
+top:-3px;
+}
+
+.radioForm{
+margin-top:0;
+ padding-top:0;
+ float:right;
+}
+.radioButton{
+margin-right: 20px
+}
+
+.instructionDiv{
+width:925px;
+height:20px;
+}
+.instructions{
+float:right;
+height:20px;
+font-size: 75%;
+}
+.selectedItemText{
+width: 327px;
+height: 21px;
+overflow:auto;
+float:left;
+}
+.selectedTerms{
+overflow:auto;
+width:525px;
+height:350px;
+}
+
+.legend{
+float:right;
+}

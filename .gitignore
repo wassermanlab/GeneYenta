@@ -3,6 +3,5 @@
 *.swp
 *.old
 .DS_Store
-/static
 geneyenta/wsgi.daemon-test.py
 geneyenta/wsgi.multithread-test.py
