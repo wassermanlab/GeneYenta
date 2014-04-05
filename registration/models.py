@@ -45,6 +45,9 @@ class UserForm(ModelForm):
 		widgets = {'password': forms.PasswordInput(),} #hides user password input
     
 class ClinicianForm(forms.ModelForm):
+	address2 = forms.CharField(required=False)
+	description = forms.CharField(widget=forms.Textarea,max_length=2500, required=False)
+	
 	def __init__(self, *args, **kwargs):
 		super(ClinicianForm, self).__init__(*args, **kwargs)
 		self.fields['description'].label='Research Summary'
