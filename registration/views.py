@@ -37,6 +37,9 @@ def home_redirect(request):
 		return HttpResponseRedirect('matches/view-matches')
 	else:
 		return HttpResponseRedirect('accounts/login')
+	
+def public(request):
+	return render(request, 'registration/homeNew.html',)
 
 # View: registraion
 # Allows the user to create an INACTIVE User account and user profile (a Clinician instance)

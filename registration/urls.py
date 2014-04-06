@@ -11,6 +11,8 @@ urlpatterns = patterns('',
 
 	#ex: /		
     url(r'^$', views.home_redirect, name='home_redirect'),
+    
+    url(r'^public/$', views.public, name="public"),
 
 	 #ex: /login/login-success/
     url(r'^login/login-success/$', views.login_success, name='login-success'),
