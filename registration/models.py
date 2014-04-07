@@ -16,10 +16,21 @@ from geneyenta.settings import EMAIL_HOST_USER
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 
+import re
+
 def validate_email_unique(value):
 	user_exists = User.objects.filter(email=value)
 	if user_exists:
 		raise ValidationError("User with this email already exists")
+	
+
+		
+def validate_phone_number_format(value):
+	searchObject = re.search(r'^(\d{3})-(\d{3})-(\d{4})$', value)
+	
+	if searchObject == None:
+		raise ValidationError("Phone Number Format: xxx-xxx-xxxx")
+	
 
 # Model Classes
 
@@ -59,13 +70,14 @@ class ClinicianForm(forms.ModelForm):
 	description = forms.CharField(widget=forms.Textarea,max_length=2500, required=False)
 	email = forms.CharField(validators=[validate_email],
 							error_messages={'invalid': ('Enter a valid email address.')})
+	phone = forms.CharField(validators=[validate_phone_number_format])
 	
 	def __init__(self, *args, **kwargs):
 		super(ClinicianForm, self).__init__(*args, **kwargs)
 		self.fields['description'].label='Research Summary'
 		del self.fields['user']
 		for key in self.fields:
-			if key != 'description' and key != 'address2' and key != 'user' and key!='email':
+			if key != 'description' and key != 'address2' and key != 'user' and key!='email' and key!='phone':
 				self.fields[key].label = self.fields[key].label + '*'
     
 	class Meta:
