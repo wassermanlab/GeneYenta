@@ -48,10 +48,12 @@ def registration(request):
 	if request.method == 'POST':
 		user_form = UserForm(request.POST, prefix='user')
 		clinician_form = ClinicianForm(request.POST, prefix='clinician')
+
+
 		if user_form.is_valid() and clinician_form.is_valid():
 			user = user_form.save(commit=False)
-			user.is_active = False # set to be inactive
-			user.set_password(user.password) #explicit function call required for password hash
+			user.is_active = False  # set to be inactive
+			user.set_password(user.password)  # explicit function call required for password hash
 			user.save()
 			userprofile = clinician_form.save(commit=False)
 			userprofile.user = user
@@ -69,13 +71,13 @@ def registration(request):
 		clinician_form = ClinicianForm(prefix='clinician')
 	context = { 'userform': user_form,
 				'userprofileform': clinician_form,
-				'next': 'registration-success/',}
+				'next': 'registration-success/', }
 	return render(request, 'registration/register.html', context)
 
 # View: registration_success
 # Returns a basic screen indicating registration success and how the user should proceed
 def registration_success(request):
-	return render(request, 'registration/registration-success.html', )
+	return render(request, 'registration/registration-success.html',)
 
 # View: contact_us
 def contact_us(request):
@@ -93,7 +95,7 @@ def login_success(request):
 # Indicates that the user has successfully changed the password of the account
 @login_required(login_url=LOGIN_REQUIRED_URL)
 def change_success(request):
-	return render(request, 'registration/change-success.html', )
+	return render(request, 'registration/change-success.html',)
 
 # View: logout_redirect
 # After loggin out, the user is redirected to the homepage
@@ -113,5 +115,5 @@ def send_file(request):
 	content_type = mimetypes.guess_type(filename)[0]
 	response = HttpResponse(wrapper, content_type=content_type)
 	response['Content-Length'] = os.path.getsize(filename)
-	response['Content-Disposition'] = "attachment; filename=%s"%download_name
+	response['Content-Disposition'] = "attachment; filename=%s" % download_name
 	return response
