@@ -10,11 +10,47 @@
 
 <body>
 <div class="row">
-  <div class=" col-lg-4 col-offset-1">
-    <h1>GeneYenta</h1>
+  <div class="text-center">
+    <h1>{% block headerTitle %}{% endblock %}</h1>
    </div>
 </div>
 
+<!-- navbar urls -->
+
+<!-- /navbar urls -->
+
+
+{% block sidebar %}   
+<!-- top-navigation -->    
+<div class="row">
+<div id="top-navigation">
+    <div class="navbar">  
+        <div class="container">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+        <a id="top-navigation-brand" href="#" class="navbar-brand">
+                    {% block header %} {% endblock %}
+        </a>      
+           
+            <div class="nav-collapse collapse navbar-responsive-collapse">
+                <ul class="nav navbar-nav">
+                	<li id="matches-tab"><a href="{% url 'home' %}">Summary</a></li>
+                    <li id="matches-tab"><a href="{% url 'login' %}">Login</a></li>
+                    <li id="cases-tab"><a href="{% url 'registration' %}">Registration</a></li>
+                    <li id="archives-tab"><a href="{% url 'reset' %}">Forgot Password</a></li>
+                    <li id="settings-tab"><a href="{% url 'contact_us' %}">Contact Us</a></li>
+                </ul>
+            </div>          
+        </div>  
+    </div>
+</div> <!-- /#top-navigation -->
+</div>   
+ 
+{% endblock %}
+    
 
 <div class="row">
     <div class="col-offset-1 col-lg-10 col-sm-10 col-12">
@@ -28,10 +64,19 @@
     </div>
 </div>
 
-<!-- Including this jquery library in any other order in this document will break the dynatree -->
+<!-- this is breaking the dynatree if it is included anywhere else
+must be fixed... 
+ -->
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-{% block content %}
-{% endblock %}
+<div class="container">
+<div class="row">
+	<div class="col-lg-11 col-12">
+	{% block content %}
+	
+	{% endblock %}
+	</div>
+</div>
+</div>
 
 
 {% block endbody %}

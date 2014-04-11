@@ -9,12 +9,12 @@ from registration import views
 # All these urls have been already truncated by the URL-Conf in geneyenta.urls
 urlpatterns = patterns('',
 
-	#ex: /		
+	# ex: /		
     url(r'^$', views.home_redirect, name='home_redirect'),
     
-    url(r'^public/$', views.public, name="public"),
+    url(r'^home/$', views.home, name="home"),
 
-	 #ex: /login/login-success/
+	 # ex: /login/login-success/
     url(r'^login/login-success/$', views.login_success, name='login-success'),
 
     # ex: /login/
@@ -22,7 +22,7 @@ urlpatterns = patterns('',
        'extra_context': 
        {
        'next':'login-success/'
-       },}, name='home'),
+       }, }, name='login'),
     
     # ex: /registration/registration-success/
     url(r'^registration/registration-success/$', views.registration_success, name='registration-success'),
@@ -33,13 +33,22 @@ urlpatterns = patterns('',
     url(r'^contact_us/$', views.contact_us, name='contact_us'),
 
     # ex: /change-password/change-success/
-    url(r'^change-password/change-success/$', views.change_success, name='change_success'),
+    #url(r'^change-password/change-success/$', views.change_success, name='change_success'),
 
     # ex: /change-password/
-    url(r'^change-password/$', 'django.contrib.auth.views.password_change', 
-        {'template_name':'registration/password-change.html',
-        'post_change_redirect':'change-success/',
-        }, name='change_password'),
+#    url(r'^change-password/$', 'django.contrib.auth.views.password_change',
+#        {'template_name':'registration/password-change.html',
+#        'post_change_redirect':'change-success/',
+#        }, name='change_password'),
+					
+	url(r'^password/reset/$', views.reset, name="reset"),
+	url(r'^password/reset/done/$', 'django.contrib.auth.views.password_reset_done', {'template_name':'registration/geneyenta_password_reset_done.html'}),
+	url(r'^password/reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$', 'django.contrib.auth.views.password_reset_confirm',
+        {'template_name':'registration/geneyenta_password_reset_confirm.html',
+		'post_reset_redirect' : '/accounts/password/done/'}),
+	url(r'^password/done/$', 'django.contrib.auth.views.password_reset_complete', 
+		{'template_name':'registration/geneyenta_password_reset_complete.html'}),				
+
     
 
     # ex: /logout/

@@ -1,6 +1,11 @@
-<!DOCTYPE html>
-<html>
-<body>
+{% extends 'registration/base.html' %}
+
+{% block title %}GeneYenta Login page{% endblock %}
+
+{% block headerTitle %}GeneYenta Login page{% endblock %}
+
+{% block content %}
+
 	<h2> Registration Success! </h2>
 	<h2> A confirmation email has been sent to the email address that you entered</h2>
 	<h3> If you have not recieved this email in the next 24hrs there has been an error processesing your
@@ -10,9 +15,7 @@
 	</p>
 
 	{% url 'django.contrib.auth.views.login' as login_page %}
-	<a href="{{login_page}}"> Click here to login </a>
+	<a href="{%url 'login'%}"> Click here to login </a>
 
 
-</body>
-</html>
-
+{% endblock %}

@@ -1,47 +1,20 @@
-
 {% extends 'registration/base.html' %}
 
-{% block title %}GeneYenta Login page{% endblock %}
+{% block title %}GeneYenta Summary{% endblock %}
+{% block headerTitle %}GeneYenta Summary{% endblock %}
 
-
-{% block content %}
-<div class="row">
-	<div class="col-lg-11 col-offset-1 col-12">
-
-
-		{% if form.errors %}
-			{% if not user.is_active %}
-			<p> This account has not been activated by administrators.</p>
-			{% else %}
-			<p> Your username and password didn't match. Please try again.</p>
-			{% endif %}
-		{% endif %}
-
-		<form method="post" action="{% url 'django.contrib.auth.views.login' %}">
-		{% csrf_token %}
-		<table>
-		<tr>
-		    <td>{{ form.username.label_tag }}</td>
-		    <td>{{ form.username }}</td>
-		</tr>
-		<tr>
-		    <td>{{ form.password.label_tag }}</td>
-		    <td>{{ form.password }}</td>
-		</tr>
-		</table>
-<input type="submit" value="Login" />
-<input type="hidden" name="next" value="{{ next }}" />
-
-</form>
-
-
-	{% url 'django.contrib.auth.views.password_reset' as reset_page %}
-	<a href="{{reset_page}}">NEEDS FIXING: Forgot your password? Click. </a>
-</br>
-	<a href="{% url 'registration' %}"> Click here to register </a>
-	<a href="">Contact Us (home)</a>
-
-</div>
-</div>
+{% block content %} 
+Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
 
 {% endblock %}
+
+{% block endbody %}
+
+<script src="{{ STATIC_URL }}cases/dynatree/jquery/jquery.js" type="text/javascript"></script>
+<script src="{{STATIC_URL}}cases/js/bootstrap.js"></script>
+<script src="{{STATIC_URL}}cases/js/sorttable.js"></script>
+
+
+
+{% endblock %}
+

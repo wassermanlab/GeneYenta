@@ -16,6 +16,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate
 from django.contrib.auth import login 
 
+from django.contrib.auth.views import password_reset, password_reset_confirm, password_reset_done
+
 # Send Mail Imports
 from django.core.mail import send_mail
 from geneyenta.settings import EMAIL_HOST_USER
@@ -36,10 +38,10 @@ def home_redirect(request):
 	if request.user.is_authenticated():
 		return HttpResponseRedirect('matches/view-matches')
 	else:
-		return HttpResponseRedirect('accounts/login')
+		return HttpResponseRedirect('accounts/home')
 	
-def public(request):
-	return render(request, 'registration/homeNew.html',)
+def home(request):
+	return render(request, 'registration/home.html',)
 
 # View: registraion
 # Allows the user to create an INACTIVE User account and user profile (a Clinician instance)
@@ -102,18 +104,13 @@ def change_success(request):
 def logout_redirect(request):
 	return HttpResponseRedirect(reverse('home'))
 
-def send_file(request):
-	import os, tempfile, zipfile
-	from django.core.servers.basehttp import FileWrapper
-	from django.conf import settings
-	from django.http import HttpResponse
-	import mimetypes
 
-	filename = "/space/apps/GeneYenta/media/GeneYenta.txt"
-	download_name = "GeneYenta.txt"
-	wrapper = FileWrapper(open(filename))
-	content_type = mimetypes.guess_type(filename)[0]
-	response = HttpResponse(wrapper, content_type=content_type)
-	response['Content-Length'] = os.path.getsize(filename)
-	response['Content-Disposition'] = "attachment; filename=%s" % download_name
-	return response
+def reset_confirm(request, uidb36=None, token=None):
+	return password_reset_confirm(request, template_name='registration/geneyenta_password_reset_confirm.html',
+        uidb36=uidb36, token=token, post_reset_redirect=reverse('home'))
+
+
+def reset(request):
+	return password_reset(request, template_name='registration/geneyenta_password_reset_form.html',
+        email_template_name='registration/geneyenta_password_reset_email.html')
+	
