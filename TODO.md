@@ -60,7 +60,7 @@
 
  	++ Define a data format and create necessary scripts to mass load test data rather than go through system interface?
 
-    ++ Use case reports from Genomics Data journal as training set	
+    ++ Use case reports from Genomics Data journal as training set.	
 
 ### Section 3 --- Back-End: System Administratior ###
 	
