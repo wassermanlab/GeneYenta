@@ -7,6 +7,8 @@ from django.contrib.auth.models import User
 from django.forms import ModelForm
 from django import forms
 
+from passwords.fields import PasswordField
+
 # Imports for signal handlers
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
@@ -59,6 +61,7 @@ class Clinician(models.Model):
 
 class UserForm(forms.ModelForm):
 	email = forms.CharField(required=True, validators=[validate_email_unique])
+	password = PasswordField(label="Password")
 	
 	class Meta:
 		model = User
