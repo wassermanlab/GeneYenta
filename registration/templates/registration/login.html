@@ -28,9 +28,19 @@
 		    <td>{{ form.password.label_tag }}</td>
 		    <td>{{ form.password }}</td>
 		</tr>
+		<tr>
+			<td></td>
+			<td>
+				<input type="submit" value="Login" />
+				<input type="hidden" name="next" value="{{ next }}" />
+			</td>
+		</tr>
+		<tr>
+			<td colspan=2>
+				Register for an account <a href="{%url 'registration'%}">here</a>.
+			</td>
+		</tr>
 		</table>
-<input type="submit" value="Login" />
-<input type="hidden" name="next" value="{{ next }}" />
 
 </form>
 
