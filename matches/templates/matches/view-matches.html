@@ -71,7 +71,7 @@
 					
 					</td>
 
-					<td><a href="{% url 'matches.views.match_detail' m.id patient_id_key %}">More info</a></td>
+					<td><a href="{% url 'matches.views.match_detail' m.id %}">More info</a></td>
 
 					<td>{{m.last_matched}}</td>
 					
@@ -106,10 +106,14 @@
 	$(document).ready(function(){
 		
 		var scroll_pixel = {{scroll_pixel}};
-		var patient_id = {{patient_id}};
+		var patient_id = '{{patient_id}}';
 		
-		if(patient_id!=0){
-			$('#list'+patient_id).collapse('show');
+		if(patient_id!=""){
+			var patient_id_objects = patient_id.split('-');
+			patient_id_objects.forEach(function(value){
+				$('#'+value).collapse('show');
+			});
+			
 		}
 		
 		if(scroll_pixel!=0){
@@ -153,7 +157,11 @@
 			event.preventDefault();
 			var scrollToPixel = $(document).scrollTop();
 			var actualLink = $(this).attr('href');
-			document.location.href = actualLink+scrollToPixel;
+			var matchIDArray = [];
+			var matchedIdsObjects = $("[class='out in']").each(function(){matchIDArray.push(this.id);});
+			var matchedStrings = matchIDArray.join('-');
+			
+			document.location.href = actualLink+matchedStrings+'/'+scrollToPixel;
 			
 		}
 	}); 
