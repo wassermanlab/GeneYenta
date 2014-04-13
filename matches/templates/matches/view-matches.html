@@ -71,7 +71,7 @@
 					
 					</td>
 
-					<td><a href="{% url 'matches.views.match_detail' m.id %}">More info</a></td>
+					<td><a href="{% url 'matches.views.match_detail' m.id patient_id_key %}">More info</a></td>
 
 					<td>{{m.last_matched}}</td>
 					
@@ -102,6 +102,22 @@
 {% block endbody %}
 
 <script type="text/javascript">
+
+	$(document).ready(function(){
+		
+		var scroll_pixel = {{scroll_pixel}};
+		var patient_id = {{patient_id}};
+		
+		if(patient_id!=0){
+			$('#list'+patient_id).collapse('show');
+		}
+		
+		if(scroll_pixel!=0){
+			$(document).scrollTop(scroll_pixel);
+		}
+	});
+	
+	
 	/* Function: async_post
 		Upon clicking the checkbox, a given match
 	notification is marked as important by submitting an ajax POST request to
@@ -130,6 +146,17 @@
 	//TODO: set the custom key attribute to the appropriate value by calling get parentx2
 
 	}
+
+	$('a').click(function() {
+		if($(this).text()=='More info'){
+			
+			event.preventDefault();
+			var scrollToPixel = $(document).scrollTop();
+			var actualLink = $(this).attr('href');
+			document.location.href = actualLink+scrollToPixel;
+			
+		}
+	}); 
 </script>
 
 <script type="text/javascript" src="{{STATIC_URL}}cases/js/popup.js"></script>

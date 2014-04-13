@@ -88,7 +88,8 @@
 	</div>
 </div>
 	
-<div class="col-offset-3 col-lg-4 col-12" style="margin-bottom: 30px;">
+<div class="col-offset-3 col-lg-6 col-12" style="margin-bottom: 30px;">
+	<button onclick="goBackTo()" class="btn btn-info">Back</button>
 	<button onclick="show_modal('#user_summary')" class="btn btn-info">
 		Review Your Case Summary
 	</button>
@@ -111,6 +112,13 @@
 <script type="text/javascript">
 		function show_modal(id){
 			$(id).modal('show');
+		}
+		function goBackTo(){
+			var scroll_pixel = {{scroll_pixel}}
+			
+			var patient_id = {{patient_id}}
+			
+			document.location.href = '/matches/view-matches/'+patient_id+'/'+scroll_pixel;
 		}
 </script>
 

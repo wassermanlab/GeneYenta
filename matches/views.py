@@ -47,7 +47,7 @@ CREATE = False
 # This allows the UI to display inboxes of matches separated for each of the Clinician's
 # patients.
 @login_required(login_url=LOGIN_REQUIRED_URL)
-def view_matches(request):
+def view_matches(request, patient_id=0, scroll_pixel=0):
 	user = request.user
 	if user.is_authenticated() and user.is_active:
 
@@ -119,6 +119,8 @@ def view_matches(request):
 			 			'match_dict': patient_match_dict,
 			 			'unread_dict': unread_match_totals,
 			 			'important_dict': important_match_totals,
+			 			'scroll_pixel':scroll_pixel,
+			 			'patient_id':patient_id
 			 		}
 			return render(request, 'matches/view-matches.html', context)
 
@@ -182,7 +184,7 @@ def _organizePatients(user_patient, other_patient, user, profile):
 # 'More Info' link for a given match.  
 # Allows users to save notes that they have entered for a given match.
 @login_required(login_url=LOGIN_REQUIRED_URL)
-def match_detail(request, match_id):
+def match_detail(request, match_id, patient_id=0, scroll_pixel=0):
 	user = request.user
 	match = Match.objects.get(pk=match_id)
 	if match.patient.clinician.id == user.clinician.id: #IMPORTANT FOR SECURITY
@@ -204,6 +206,8 @@ def match_detail(request, match_id):
 		else:
 			context = _organizePatients(match.patient, match.matched_patient, user, user.clinician)
 			context['current_match'] = match
+			context['patient_id'] = patient_id
+			context['scroll_pixel'] = scroll_pixel
 			return render(request, 'matches/match-detail.html', context)
 	else:
 		return forbidden_request(request)

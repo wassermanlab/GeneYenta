@@ -69,8 +69,10 @@
 
 
 <div class="row">
-	<div class="col-lg-4 col-offset-4 col-12">
+	<div class="col-lg-6 col-offset-4 col-12">
+		<a class="btn btn-default" href="{% url 'view_cases' %}"> Back </a>
 		<a class="btn btn-default" href="{% url 'cases.views.patient_edit' patient.id %}"> Edit this patient </a>
+		
 	{% if patient.is_archived %}
 		<form name='archive-button' id="form" method="POST" style="display:inline;">
 			{% csrf_token %}
@@ -86,5 +88,6 @@
 	{% endif %}
 	</div>
 </div>
+
 		
 {% endblock %}
