@@ -25,7 +25,10 @@ from geneyenta.settings import EMAIL_HOST_USER
 # Custom imports
 from helper import LOGIN_REQUIRED_URL
 
-
+import os
+import mimetypes
+from django.core.servers.basehttp import FileWrapper
+from django.http import HttpResponse
 # View: [view title]
 # [view description]
 
@@ -113,4 +116,12 @@ def reset_confirm(request, uidb36=None, token=None):
 def reset(request):
 	return password_reset(request, template_name='registration/geneyenta_password_reset_form.html',
         email_template_name='registration/geneyenta_password_reset_email.html')
-	
+
+def download_file(request):
+	the_file='/space/apps/GeneYenta/media/GeneYentaSecond.txt'
+	filename=os.path.basename(the_file)
+	response = HttpResponse(FileWrapper(open(the_file)),
+				content_type=mimetypes.guess_type(the_file)[0])
+	response['Content-Length'] = os.path.getsize(the_file)
+	response['Content-Disposition']="attachment;filename=%s" % filename
+	return response	
