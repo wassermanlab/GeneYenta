@@ -71,7 +71,7 @@ def view_matches(request):
 			#BEWARE: Do not use the app name as a variable name for the template.
 			#i.e. I used 'matches':matches = Match.objects.filter...
 			#I got the strangest errors, where it would iterate over an empty set
-			users_matches = Match.objects.filter(patient__clinician=profile).filter(patient__is_archived=False)
+			users_matches = Match.objects.filter(patient__clinician=profile).filter(patient__is_archived=False).order_by('-last_matched')
 
 			#This dictionary maps each patient id to an array of matches for that patient.
 			patient_match_dict = dict()
