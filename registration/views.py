@@ -66,6 +66,7 @@ def registration(request):
 			message = 'Hello, You have registered for GeneYenta. \
 			You will be notified when your account has been approved.'
 			subject = 'Confirmation of GeneYenta Registration'
+			huamn = True
 			try:
 				send_mail(subject, message, EMAIL_HOST_USER, [user.email])
 			except:

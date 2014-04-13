@@ -9,6 +9,8 @@ from django import forms
 
 from passwords.fields import PasswordField
 
+from captcha.fields import CaptchaField
+
 # Imports for signal handlers
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
@@ -71,16 +73,17 @@ class UserForm(forms.ModelForm):
 class ClinicianForm(forms.ModelForm):
 	address2 = forms.CharField(required=False)
 	description = forms.CharField(widget=forms.Textarea,max_length=2500, required=False)
-	email = forms.CharField(validators=[validate_email],
+	email = forms.CharField(label='Email*',validators=[validate_email],
 							error_messages={'invalid': ('Enter a valid email address.')})
 	phone = forms.CharField(validators=[validate_phone_number_format])
+	captcha = CaptchaField()
 	
 	def __init__(self, *args, **kwargs):
 		super(ClinicianForm, self).__init__(*args, **kwargs)
 		self.fields['description'].label='Research Summary'
 		del self.fields['user']
 		for key in self.fields:
-			if key != 'description' and key != 'address2' and key != 'user' and key!='email' and key!='phone':
+			if key != 'description' and key != 'address2' and key != 'user' and key!='email' and key!='phone' and key!='captcha':
 				self.fields[key].label = self.fields[key].label + '*'
     
 	class Meta:
