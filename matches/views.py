@@ -103,10 +103,10 @@ def _mergeDataFromSession(request_session, key, appended_data):
 def _getMatches(request_session, user_id):
 	user_clinician = Clinician.objects.filter(id=user_id)
 	if request_session.get('patient_match_dict'):
-		matched_patient = Patient.objects.filter(clinician=user_clinician).order_by('id')[100:]
+		matched_patient = Patient.objects.filter(clinician=user_clinician).order_by('id')[5:]
 		print 'yes'
 	else:
-		matched_patient = Patient.objects.filter(clinician=user_clinician).order_by('id')[:100]
+		matched_patient = Patient.objects.filter(clinician=user_clinician).order_by('id')[:5]
 		print 'no'
 		
 	patient_list=list()
