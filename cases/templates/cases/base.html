@@ -47,8 +47,10 @@
                     <li id="settings-tab"><a href="{{settings}}">Settings</a></li>
                     <li><p class="navbar-text" style="margin-left:30px;"> Signed in as {{user.username}}</p></li>
                     <li id="contact-us-tab"><a href="{% url 'contact_us'%}">Contact Us</a></li>
-                    <li><a href="{{logout}}" style="margin-left:150px">Logout</a></li>
                 </ul>
+                <ul class="nav navbar-nav pull-right">
+                     <li><a href="{{logout}}" >Logout</a></li> 
+				</ul>
             </div>          
         </div>  
     </div>
