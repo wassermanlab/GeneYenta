@@ -39,7 +39,7 @@ from django.http import HttpResponse
 # If not, the user is redirected to the login page.
 def home_redirect(request):
 	if request.user.is_authenticated():
-		return HttpResponseRedirect('matches/view-matches')
+		return HttpResponseRedirect('cases/view-cases')
 	else:
 		return HttpResponseRedirect('accounts/home')
 	
@@ -95,7 +95,7 @@ def contact_us(request):
 # redirected to the url that displays the matches for their cases. 
 @login_required(login_url=LOGIN_REQUIRED_URL)
 def login_success(request):
-	return HttpResponseRedirect(reverse('view_matches'))
+	return HttpResponseRedirect(reverse('view_cases'))
 
 # View: change_succsess
 # Indicates that the user has successfully changed the password of the account
