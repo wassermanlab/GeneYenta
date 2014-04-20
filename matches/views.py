@@ -68,51 +68,17 @@ def view_matches(request, patient_id="", scroll_pixel=0):
 		else:
 			profile = user.clinician
 
-			#BEWARE: Do not use the app name as a variable name for the template.
-			#i.e. I used 'matches':matches = Match.objects.filter...
-			#I got the strangest errors, where it would iterate over an empty set
-			users_matches = Match.objects.filter(patient__clinician=profile).filter(patient__is_archived=False).order_by('-last_matched')
+
+			
+			users_matches = _getMatches(request.session, user.clinician.id)
+			
 
 			#This dictionary maps each patient id to an array of matches for that patient.
-			patient_match_dict = dict()
+			patient_match_dict, unread_match_totals, important_match_totals = _parseMatches(users_matches)
+			patient_match_dict = _mergeDataFromSession(request.session, 'patient_match_dict', patient_match_dict)
+			unread_match_totals = _mergeDataFromSession(request.session, 'unread_match_totals', unread_match_totals)
+			important_match_totals = _mergeDataFromSession(request.session, 'important_match_totals', important_match_totals)
 
-			#Maps each patient id to the number of unread messages associated with that patient.
-			unread_match_totals = dict()
-
-			#Maps each patient id to the number of important messages associated with that patient.
-			important_match_totals = dict()
-
-			for match in users_matches:
-
-				key = match.patient.id
-
-				if key not in patient_match_dict:
-					#Creates a empty list of matches and maps that to the match id
-					#needed an explicit declaration, rather than '[]' shorthand
-					#otherwise it threw error 'Match is not iterable'
-					patient_match_dict[key] = list() 
-					patient_match_dict[key].append(match)
-					
-					# Initializes appropriate unread or is_important totals
-					if match.is_important:
-						important_match_totals[key] = 1
-					else:
-						important_match_totals[key] = 0
-					if match.is_read:
-						unread_match_totals[key] = 0
-					else:
-						unread_match_totals[key] = 1					
-				else:
-					#Adds the match to the pre-existing list matched to the var key		
-					patient_match_dict[key].append(match)
-
-					# Increments appropriate unread or is_important totals					
-					if match.is_important:
-						new_i = important_match_totals[key] + 1
-						important_match_totals[key] = new_i			
-					if not match.is_read:
-						new_u = unread_match_totals[key] + 1
-						unread_match_totals[key] = new_u
 			
 			context = {'user': user,
 			 			'profile': profile,
@@ -123,6 +89,80 @@ def view_matches(request, patient_id="", scroll_pixel=0):
 			 			'patient_id':patient_id
 			 		}
 			return render(request, 'matches/view-matches.html', context)
+		
+def _mergeDataFromSession(request_session, key, appended_data):
+	if request_session.get(key):
+		data_in_session = request_session.get(key);
+		new_data_in_session = dict(data_in_session, **appended_data)
+		return new_data_in_session
+	else:
+		request_session[key] = appended_data;
+		return appended_data
+		
+		
+def _getMatches(request_session, user_id):
+	user_clinician = Clinician.objects.filter(id=user_id)
+	if request_session.get('patient_match_dict'):
+		matched_patient = Patient.objects.filter(clinician=user_clinician).order_by('id')[100:]
+		print 'yes'
+	else:
+		matched_patient = Patient.objects.filter(clinician=user_clinician).order_by('id')[:100]
+		print 'no'
+		
+	patient_list=list()
+	for e in matched_patient:
+		patient_list.append(e.id)
+		
+	#BEWARE: Do not use the app name as a variable name for the template.
+	#i.e. I used 'matches':matches = Match.objects.filter...
+	#I got the strangest errors, where it would iterate over an empty set
+	users_matches = Match.objects.filter(patient__id__in=patient_list).filter(patient__is_archived=False).order_by('-last_matched')
+	
+	return users_matches
+
+
+def _parseMatches(users_matches):
+		#This dictionary maps each patient id to an array of matches for that patient.
+	patient_match_dict = dict()
+
+	#Maps each patient id to the number of unread messages associated with that patient.
+	unread_match_totals = dict()
+
+	#Maps each patient id to the number of important messages associated with that patient.
+	important_match_totals = dict()
+
+	for match in users_matches:
+
+		key = match.patient.id
+
+		if key not in patient_match_dict:
+			#Creates a empty list of matches and maps that to the match id
+			#needed an explicit declaration, rather than '[]' shorthand
+			#otherwise it threw error 'Match is not iterable'
+			patient_match_dict[key] = list() 
+			patient_match_dict[key].append(match)
+			
+			# Initializes appropriate unread or is_important totals
+			if match.is_important:
+				important_match_totals[key] = 1
+			else:
+				important_match_totals[key] = 0
+			if match.is_read:
+				unread_match_totals[key] = 0
+			else:
+				unread_match_totals[key] = 1					
+		else:
+			#Adds the match to the pre-existing list matched to the var key		
+			patient_match_dict[key].append(match)
+
+			# Increments appropriate unread or is_important totals					
+			if match.is_important:
+				new_i = important_match_totals[key] + 1
+				important_match_totals[key] = new_i			
+			if not match.is_read:
+				new_u = unread_match_totals[key] + 1
+				unread_match_totals[key] = new_u
+	return patient_match_dict, unread_match_totals, important_match_totals
 
 # Helper Class: Term
 # Used to simplify unpacking of values in the template-code.
