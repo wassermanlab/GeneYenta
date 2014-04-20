@@ -104,10 +104,8 @@ def _getMatches(request_session, user_id):
 	user_clinician = Clinician.objects.filter(id=user_id)
 	if request_session.get('patient_match_dict'):
 		matched_patient = Patient.objects.filter(clinician=user_clinician).order_by('id')[5:]
-		print 'yes'
 	else:
 		matched_patient = Patient.objects.filter(clinician=user_clinician).order_by('id')[:5]
-		print 'no'
 		
 	patient_list=list()
 	for e in matched_patient:
@@ -244,11 +242,15 @@ def match_detail(request, match_id, patient_id="", scroll_pixel=0):
 			except Exception,e:
 				print str(e)
 		else:
-			context = _organizePatients(match.patient, match.matched_patient, user, user.clinician)
-			context['current_match'] = match
-			context['patient_id'] = patient_id
-			context['scroll_pixel'] = scroll_pixel
-			return render(request, 'matches/match-detail.html', context)
+			try:
+				context = _organizePatients(match.patient, match.matched_patient, user, user.clinician)
+				context['current_match'] = match
+				context['patient_id'] = patient_id
+				context['scroll_pixel'] = scroll_pixel
+				return render(request, 'matches/match-detail.html', context)
+			except Exception, e:
+				return render(request, 'matches/does-not-exist.html')
+				
 	else:
 		return forbidden_request(request)
 
