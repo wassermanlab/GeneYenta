@@ -35,14 +35,14 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
         </button>
-        <a id="top-navigation-brand" href="#" class="navbar-brand">
+        <a id="top-navigation-brand" href="#" class="navbar-brand" style="background: black;color: white;">
                     {% block header %} {% endblock %}
         </a>      
            
             <div class="nav-collapse collapse navbar-responsive-collapse">
                 <ul class="nav navbar-nav">
-                    <li id="matches-tab"><a href="{{matches}}">Matches</a></li>
-                    <li id="cases-tab"><a href="{{cases}}">Cases</a></li>
+                    <li id="view-matches-tab"><a href="{{matches}}">Matches</a></li>
+                    <li id="view-cases-tab"><a href="{{cases}}">Cases</a></li>
                     <li id="archives-tab"><a href="{{archives}}">Archives</a></li>
                     <li id="settings-tab"><a href="{{settings}}">Settings</a></li>
                     <li><p class="navbar-text" style="margin-left:30px;"> Signed in as {{user.username}}</p></li>
@@ -85,6 +85,23 @@ must be fixed...
 
 <div class="endbody-padding"></div>
 <script src="{{STATIC_URL}}cases/js/bootstrap.min.js"></script>
+
+<script type="text/javascript">
+	var pathname = window.location.pathname.split('/').filter(function(v){return v!==''});
+	var cur_page_last = pathname[pathname.length-1]+'-tab'
+	var cur_page_first = 'view-'+pathname[0]+'-tab'
+	var find_id_last = $('#'+cur_page_last)
+	var find_id_first = $('#'+cur_page_first)
+	if(find_id_last.length>0){
+		find_id_last.addClass('active');
+	}else if(find_id_first.length>0){
+		find_id_first.addClass('active');
+	}else{
+		$('#settings-tab').addClass('active');
+	}
+	
+</script>
+
 
 
 </body>
