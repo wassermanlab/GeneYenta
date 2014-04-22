@@ -94,7 +94,7 @@ must be fixed...
 	var find_id_first = $('#'+cur_page_first)
 	if(find_id_last.length>0){
 		find_id_last.addClass('active');
-	}else if(find_id_first.length>0){
+	}else if(find_id_first.length>0&&cur_page_last!='change-password-tab'&&cur_page_last!='profile-edit-tab'){
 		find_id_first.addClass('active');
 	}else{
 		$('#settings-tab').addClass('active');
