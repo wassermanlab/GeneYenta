@@ -37,11 +37,11 @@
            
             <div class="nav-collapse collapse navbar-responsive-collapse">
                 <ul class="nav navbar-nav">
-                	<li id="matches-tab"><a href="{% url 'home' %}">Summary</a></li>
-                    <li id="matches-tab"><a href="{% url 'login' %}">Login</a></li>
-                    <li id="cases-tab"><a href="{% url 'registration' %}">Registration</a></li>
-                    <li id="archives-tab"><a href="{% url 'reset' %}">Forgot Password</a></li>
-                    <li id="settings-tab"><a href="{% url 'contact_us' %}">Contact Us</a></li>
+                	<li id="home-tab"><a href="{% url 'home' %}">Summary</a></li>
+                    <li id="login-tab"><a href="{% url 'login' %}">Login</a></li>
+                    <li id="registration-tab"><a href="{% url 'registration' %}">Registration</a></li>
+                    <li id="reset-tab"><a href="{% url 'reset' %}">Forgot Password</a></li>
+                    <li id="contact_us-tab"><a href="{% url 'contact_us' %}">Contact Us</a></li>
                 </ul>
             </div>          
         </div>  
@@ -85,6 +85,11 @@ must be fixed...
 <div class="endbody-padding"></div>
 <script src="{{STATIC_URL}}cases/js/bootstrap.min.js"></script>
 
+<script type="text/javascript">
+	var pathname = window.location.pathname.split('/').filter(function(v){return v!==''});
+	var cur_page = pathname[pathname.length-1]+'-tab'
+	$('#'+cur_page).addClass('active');
+</script>
 
 </body>
 </html>
