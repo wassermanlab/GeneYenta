@@ -25,12 +25,14 @@ from matches.models import Match
 #Custom package imports
 from helper import forbidden_request 
 from helper import LOGIN_REQUIRED_URL 
+from django.conf import settings
 
 #Constants
 #MATCH_THRESHOLD = 0.1 #currently unused, all matches regardless of score are shown to the viewer
 EDIT = True
 CREATE = False
 
+TOP_X_MATCHES = getattr(settings, "MATCHES_PAGE_TOP_X_MATCH", 5)
 
 # View: [view name]
 # [function description]
@@ -103,9 +105,9 @@ def _mergeDataFromSession(request_session, key, appended_data):
 def _getMatches(request_session, user_id):
 	user_clinician = Clinician.objects.filter(id=user_id)
 	if request_session.get('patient_match_dict'):
-		matched_patient = Patient.objects.filter(clinician=user_clinician).order_by('id')[5:]
+		matched_patient = Patient.objects.filter(clinician=user_clinician).order_by('id')[TOP_X_MATCHES:]
 	else:
-		matched_patient = Patient.objects.filter(clinician=user_clinician).order_by('id')[:5]
+		matched_patient = Patient.objects.filter(clinician=user_clinician).order_by('id')[:TOP_X_MATCHES]
 		
 	patient_list=list()
 	for e in matched_patient:

@@ -78,7 +78,7 @@
 					<td>
 						<a onmouseover='nhpup.popup("{{m.notes}}")' href="#">Hover to view notes</a>
 					</td>
-					<td>{{m.score}}</td>
+					<td>{{m.score|to_percentage}}</td>
 					<td>{{m.matched_patient.id}}</td>
 				</tr>					
 				{% endfor %}
