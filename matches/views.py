@@ -33,6 +33,7 @@ EDIT = True
 CREATE = False
 
 TOP_X_MATCHES = getattr(settings, "MATCHES_PAGE_TOP_X_MATCH", 5)
+MATCHES_PAGE_MINIMUM_SCORE = getattr(settings, "MATCHES_PAGE_MINIMUM_SCORE", 0.1)
 
 # View: [view name]
 # [function description]
@@ -105,7 +106,7 @@ def _mergeDataFromSession(request_session, key, appended_data):
 def _getMatches(request_session, user_id):
 	user_clinician = Clinician.objects.filter(id=user_id)
 	if request_session.get('patient_match_dict'):
-		matched_patient = Patient.objects.filter(clinician=user_clinician).order_by('id')[TOP_X_MATCHES:]
+		matched_patient = Patient.objects.filter(clinician=user_clinician).order_by('id')
 	else:
 		matched_patient = Patient.objects.filter(clinician=user_clinician).order_by('id')[:TOP_X_MATCHES]
 		
@@ -116,8 +117,10 @@ def _getMatches(request_session, user_id):
 	#BEWARE: Do not use the app name as a variable name for the template.
 	#i.e. I used 'matches':matches = Match.objects.filter...
 	#I got the strangest errors, where it would iterate over an empty set
-	users_matches = Match.objects.filter(patient__id__in=patient_list).filter(patient__is_archived=False).order_by('-last_matched')
-	
+	if request_session.get('patient_match_dict'):
+		users_matches = Match.objects.filter(patient__id__in=patient_list).filter(patient__is_archived=False).order_by('-last_matched')
+	else:
+		users_matches = Match.objects.filter(patient__id__in=patient_list).filter(patient__is_archived=False).filter(score__gt=MATCHES_PAGE_MINIMUM_SCORE).order_by('-last_matched')
 	return users_matches
 
 
