@@ -41,11 +41,11 @@
 				<thead>
 					<tr>
 						<th>Important?</th>
-						<th></th>
 						<th>Date Matched</th>
 						<th>Your Notes</th>
 						<th>Score</th>
 						<th>Other Patient's ID.</th>
+						<th></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -71,8 +71,6 @@
 					
 					</td>
 
-					<td><a href="{% url 'matches.views.match_detail' m.id %}">More info</a></td>
-
 					<td>{{m.last_matched}}</td>
 					
 					<td>
@@ -80,6 +78,7 @@
 					</td>
 					<td>{{m.score|to_percentage}}</td>
 					<td>{{m.matched_patient.id}}</td>
+					<td><a href="{% url 'matches.views.match_detail' m.id %}">Detail</a></td>
 				</tr>					
 				{% endfor %}
 				</tbody>
