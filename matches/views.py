@@ -51,6 +51,7 @@ MATCHES_PAGE_MINIMUM_SCORE = getattr(settings, "MATCHES_PAGE_MINIMUM_SCORE", 0.1
 # patients.
 @login_required(login_url=LOGIN_REQUIRED_URL)
 def view_matches(request, patient_id="", scroll_pixel=0):
+	more_data = bool(request.GET.get('more'))
 	user = request.user
 	if user.is_authenticated() and user.is_active:
 
@@ -73,14 +74,14 @@ def view_matches(request, patient_id="", scroll_pixel=0):
 
 
 			
-			users_matches = _getMatches(request.session, user.clinician.id)
+			users_matches = _getMatches(request.session, user.clinician.id, more_data)
 			
 
 			#This dictionary maps each patient id to an array of matches for that patient.
 			patient_match_dict, unread_match_totals, important_match_totals = _parseMatches(users_matches)
-			patient_match_dict = _mergeDataFromSession(request.session, 'patient_match_dict', patient_match_dict)
-			unread_match_totals = _mergeDataFromSession(request.session, 'unread_match_totals', unread_match_totals)
-			important_match_totals = _mergeDataFromSession(request.session, 'important_match_totals', important_match_totals)
+			#patient_match_dict = _mergeDataFromSession(request.session, 'patient_match_dict', patient_match_dict)
+			#unread_match_totals = _mergeDataFromSession(request.session, 'unread_match_totals', unread_match_totals)
+			#important_match_totals = _mergeDataFromSession(request.session, 'important_match_totals', important_match_totals)
 
 			
 			context = {'user': user,
@@ -103,9 +104,9 @@ def _mergeDataFromSession(request_session, key, appended_data):
 		return appended_data
 		
 		
-def _getMatches(request_session, user_id):
+def _getMatches(request_session, user_id, more_data):
 	user_clinician = Clinician.objects.filter(id=user_id)
-	if request_session.get('patient_match_dict'):
+	if more_data:
 		matched_patient = Patient.objects.filter(clinician=user_clinician).order_by('id')
 	else:
 		matched_patient = Patient.objects.filter(clinician=user_clinician).order_by('id')[:TOP_X_MATCHES]
@@ -117,7 +118,7 @@ def _getMatches(request_session, user_id):
 	#BEWARE: Do not use the app name as a variable name for the template.
 	#i.e. I used 'matches':matches = Match.objects.filter...
 	#I got the strangest errors, where it would iterate over an empty set
-	if request_session.get('patient_match_dict'):
+	if more_data:
 		users_matches = Match.objects.filter(patient__id__in=patient_list).filter(patient__is_archived=False).order_by('-last_matched')
 	else:
 		users_matches = Match.objects.filter(patient__id__in=patient_list).filter(patient__is_archived=False).filter(score__gt=MATCHES_PAGE_MINIMUM_SCORE).order_by('-last_matched')
