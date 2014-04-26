@@ -25,28 +25,29 @@
 		<table class="sortable table table-condensed">	
             <thead>
                 <tr>
-                	<th></th>
                   	<th>Private ID.</th>
                   	<th>GeneYenta ID.</th>
                   	<th>Clinic</th>
                 	<th>Institute</th>
                 	<th>Year</th>
                 	<th>Last Modified</th>
+                	<th></th>
             	 </tr>
           	</thead>
           	<tbody>
 			{% for p in patient_list %}
 				<tr>
-					<td>
-						<a href="{% url 'cases.views.patient_detail' p.id %}"> More Info 
-						</a>
-					</td>
+
 					<td>{{p.private_id}}</td>
 					<td>{{p.id}}</td>
 					<td>{{p.clinic}}</td>
 					<td>{{p.institute}}</td>
 					<td>{{p.first_appointment_year}}</td>
 					<td>{{p.last_modified}}</td>
+					<td>
+						<a href="{% url 'cases.views.patient_detail' p.id %}"> Detail
+						</a>
+					</td>
 				</tr>
 			{% endfor %}
 		</tbody>
