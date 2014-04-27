@@ -1,4 +1,5 @@
 {% extends 'cases/base.html' %}
+{% load case_util_tags_filter %}
 
 {% block title %}GeneYenta View Cases{% endblock %}
 
@@ -45,6 +46,12 @@
 					<td>
 						<a href="{% url 'cases.views.patient_detail' p.id %}"> Detail
 						</a>
+					</td>
+				</tr>
+				<tr>
+					<td><strong>Summary: </strong></td>
+					<td colspan="5">
+						{{p.case_summary|parse_summary}}
 					</td>
 				</tr>
 			{% endfor %}
