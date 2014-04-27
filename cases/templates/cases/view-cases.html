@@ -36,7 +36,7 @@
           	</thead>
           	<tbody>
 			{% for p in patient_list %}
-				<tr>
+				<tr onmouseover='nhpup.popup("{{p.case_summary|parse_summary}}")' href="#">
 
 					<td>{{p.private_id}}</td>
 					<td>{{p.clinic}}</td>
@@ -46,12 +46,6 @@
 					<td>
 						<a href="{% url 'cases.views.patient_detail' p.id %}"> Detail
 						</a>
-					</td>
-				</tr>
-				<tr>
-					<td><strong>Summary</strong></td>
-					<td colspan="5">
-						{{p.case_summary|parse_summary}}
 					</td>
 				</tr>
 			{% endfor %}
@@ -67,9 +61,9 @@
 {% endblock %}
 
 {% block endbody %}
+<script type="text/javascript" src="{{STATIC_URL}}cases/js/popup.js"></script>
 <script src="{{STATIC_URL}}cases/js/sorttable.js"></script>
 {% endblock %}
-
 
 
 

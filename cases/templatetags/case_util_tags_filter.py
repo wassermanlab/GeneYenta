@@ -12,8 +12,8 @@ register = template.Library()
 @register.filter
 def parse_summary(value):
     if len(value) >=40:
-        ret_summary = value[0:40] + '...'
+        ret_summary = 'Summary: ' + value[0:40] + '...'
     else:
-        ret_summary = value
+        ret_summary = 'Summary: ' + value
     return ret_summary
 
