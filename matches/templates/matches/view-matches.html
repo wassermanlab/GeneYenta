@@ -74,7 +74,7 @@
 					<td>{{m.last_matched}}</td>
 					
 					<td>
-						<a onmouseover='nhpup.popup("{{m.notes}}")' href="#">Hover to view notes</a>
+						<a onclick="show_modal('#view_notes', '{{m.notes}}')" href="#">Notes</a>
 					</td>
 					<td>{{m.score|to_percentage}}</td>
 					<td>{{m.matched_patient.id}}</td>
@@ -92,6 +92,7 @@
 </div>
 {% endif %}
 
+{% ssi "/apps/GeneYenta/matches/templates/matches/view-notes-modal.html" parsed %}
 
 {% endblock %}
 
@@ -120,6 +121,10 @@
 		}
 	});
 	
+	function show_modal(id, content){
+		$('#noteContent').text(content);
+		$(id).modal('show');
+	}
 	
 	/* Function: async_post
 		Upon clicking the checkbox, a given match
