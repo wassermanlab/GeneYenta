@@ -15,7 +15,12 @@
 		<h5><small>Click on the headers below to see the matches for each patient.</small></h5>
 	</div>
 	<div class="col-lg-3 col-12">
+		{% if from_case %}
+		<a class="btn btn-default" href="/matches/view-matches/?from_case=True&patient_id={{from_case_patient_id}}&more=true">Display More Matches</a>
+		{% else %}
 		<a class="btn btn-default" href="/matches/view-matches/?more=true">Display More Matches</a>
+		{% endif %}	
+		
 	</div>
 </div>
 
