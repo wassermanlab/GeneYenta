@@ -119,9 +119,10 @@ def _getMatches(request_session, user_id, more_data):
 	#i.e. I used 'matches':matches = Match.objects.filter...
 	#I got the strangest errors, where it would iterate over an empty set
 	if more_data:
-		users_matches = Match.objects.filter(patient__id__in=patient_list).filter(patient__is_archived=False).order_by('-last_matched')
+		users_matches = Match.objects.filter(patient__id__in=patient_list).filter(patient__is_archived=False).filter(matched_patient__isnull=False).order_by('-last_matched')
 	else:
-		users_matches = Match.objects.filter(patient__id__in=patient_list).filter(patient__is_archived=False).filter(score__gt=MATCHES_PAGE_MINIMUM_SCORE).order_by('-last_matched')
+		users_matches = Match.objects.filter(patient__id__in=patient_list).filter(patient__is_archived=False).filter(matched_patient__isnull=False).filter(score__gt=MATCHES_PAGE_MINIMUM_SCORE).order_by('-last_matched')
+		#users_matches = Match.objects.filter(patient__id__in=patient_list).filter(patient__is_archived=False).filter(score__gt=MATCHES_PAGE_MINIMUM_SCORE).order_by('-last_matched')
 	return users_matches
 
 
