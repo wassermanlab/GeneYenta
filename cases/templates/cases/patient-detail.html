@@ -71,6 +71,8 @@
 <div class="row">
 	<div class="col-lg-6 col-offset-4 col-12">
 		<a class="btn btn-default" href="{% url 'view_cases' %}"> Back </a>
+		
+		<a class="btn btn-default" href="/matches/view-matches?from_case=True&patient_id={{patient.id}}"> View Matches </a>
 		<a class="btn btn-default" href="{% url 'cases.views.patient_edit' patient.id %}"> Edit this patient </a>
 		
 	{% if patient.is_archived %}

@@ -52,6 +52,8 @@ MATCHES_PAGE_MINIMUM_SCORE = getattr(settings, "MATCHES_PAGE_MINIMUM_SCORE", 0.1
 @login_required(login_url=LOGIN_REQUIRED_URL)
 def view_matches(request, patient_id="", scroll_pixel=0):
 	more_data = bool(request.GET.get('more'))
+	from_case = bool(request.GET.get('from_case'))
+	from_case_patient_id= str(request.GET.get('patient_id'))
 	user = request.user
 	if user.is_authenticated() and user.is_active:
 
@@ -73,9 +75,11 @@ def view_matches(request, patient_id="", scroll_pixel=0):
 			profile = user.clinician
 
 
-			
-			users_matches = _getMatches(request.session, user.clinician.id, more_data)
-			
+			if from_case:
+				users_matches = _getMatchesByPatientId(from_case_patient_id, more_data)				
+			else:
+				users_matches = _getMatches(user.clinician.id, more_data)
+				
 
 			#This dictionary maps each patient id to an array of matches for that patient.
 			patient_match_dict, unread_match_totals, important_match_totals = _parseMatches(users_matches)
@@ -90,7 +94,9 @@ def view_matches(request, patient_id="", scroll_pixel=0):
 			 			'unread_dict': unread_match_totals,
 			 			'important_dict': important_match_totals,
 			 			'scroll_pixel':scroll_pixel,
-			 			'patient_id':patient_id
+			 			'patient_id':patient_id,
+			 			'from_case_patient_id':from_case_patient_id,
+			 			'from_case':from_case
 			 		}
 			return render(request, 'matches/view-matches.html', context)
 		
@@ -102,9 +108,17 @@ def _mergeDataFromSession(request_session, key, appended_data):
 	else:
 		request_session[key] = appended_data;
 		return appended_data
+	
+def _getMatchesByPatientId(patient_id, more_data):
+	if more_data:
+		users_matches = Match.objects.filter(patient__id=patient_id).filter(patient__is_archived=False).filter(matched_patient__isnull=False).order_by('-last_matched')
+	else:
+		users_matches = Match.objects.filter(patient__id=patient_id).filter(patient__is_archived=False).filter(matched_patient__isnull=False).filter(score__gt=MATCHES_PAGE_MINIMUM_SCORE).order_by('-last_matched')
+		
+	return users_matches;
 		
 		
-def _getMatches(request_session, user_id, more_data):
+def _getMatches(user_id, more_data):
 	user_clinician = Clinician.objects.filter(id=user_id)
 	if more_data:
 		matched_patient = Patient.objects.filter(clinician=user_clinician).order_by('id')
