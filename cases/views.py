@@ -169,9 +169,9 @@ def patient_edit(request, patient_id):
     
 @login_required(login_url=LOGIN_REQUIRED_URL)      
 def delete_patient_matches(request, patient_id):
-#    Patient.objects.filter(id=patient_id).delete();
-#    Match.objects.filter(patient__id=patient_id).delete();
-#    Match.objects.filter(matched_patient__id=patient_id).delete();
+    Patient.objects.filter(id=patient_id).delete();
+    Match.objects.filter(patient__id=patient_id).delete();
+    Match.objects.filter(matched_patient__id=patient_id).delete();
     return redirect('cases.views.view_cases');
     
 
