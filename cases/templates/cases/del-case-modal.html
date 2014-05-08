@@ -1,0 +1,32 @@
+<!-- Modal -->
+<div class="modal fade" id="del_case">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					&times;
+				</button>
+				<h4 class="modal-title">Delete This Case</h4>
+			</div>
+			<div class="modal-body">
+				Do you really want to delete this case?
+
+			</div>
+
+			<div class="modal-footer">
+				<a class="btn btn-danger" href="/cases/delete-a-case/{{patient.id}}">Delete</a>
+
+				{% if not patient.is_archived %}
+				<form name='archive-button' id="form" method="POST" style="display:inline;">
+					{% csrf_token %}
+					<input class="btn btn-danger" type="submit" value="Archive case"/>
+					<input type="hidden" name="archive" value="{{patient.id}}"/>
+				</form>
+				{% endif %}
+				<button type="button" class="btn btn-danger" data-dismiss="modal">
+					Cancel
+				</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

@@ -73,6 +73,7 @@
 		<a class="btn btn-default" href="{% url 'view_cases' %}"> Back </a>
 		
 		<a class="btn btn-default" href="/matches/view-matches?from_case=True&patient_id={{patient.id}}"> View Matches </a>
+		<a class="btn btn-default" onclick="show_modal('#del_case')">Delete</a>
 		<a class="btn btn-default" href="{% url 'cases.views.patient_edit' patient.id %}"> Edit this patient </a>
 		
 	{% if patient.is_archived %}
@@ -90,6 +91,18 @@
 	{% endif %}
 	</div>
 </div>
-
+{% ssi "/apps/GeneYenta/cases/templates/cases/del-case-modal.html" parsed %}
 		
+{% endblock %}
+
+{% block endbody %}
+
+<script type="text/javascript">
+
+		function show_modal(id){
+			$(id).modal('show');
+		}
+		
+</script>
+
 {% endblock %}
