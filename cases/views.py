@@ -14,6 +14,7 @@ from django.db import models
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.shortcuts import redirect
 
 #Model-Related Imports
 from django.contrib.auth.models import User
@@ -22,6 +23,7 @@ from registration.models import ClinicianForm
 from cases.models import Patient
 from cases.models import Phenotype
 from cases.models import PatientForm
+from matches.models import Match
 
 #Custom Package Imports
 from helper import forbidden_request, LOGIN_REQUIRED_URL
@@ -164,6 +166,14 @@ def patient_edit(request, patient_id):
             return render(request, 'cases/patient-edit.html', context)
     else:
         return forbidden_request(request)
+    
+@login_required(login_url=LOGIN_REQUIRED_URL)      
+def delete_patient_matches(request, patient_id):
+#    Patient.objects.filter(id=patient_id).delete();
+#    Match.objects.filter(patient__id=patient_id).delete();
+#    Match.objects.filter(matched_patient__id=patient_id).delete();
+    return redirect('cases.views.view_cases');
+    
 
 # View: profile_edit
 # Allows the user to edit their profile information 

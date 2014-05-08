@@ -13,6 +13,8 @@ urlpatterns = patterns('',
 
     # ex: view-cases/
     url(r'^view-cases/$', views.view_cases, name='view_cases'),
+    
+    url(r'^delete-a-case/(?P<patient_id>\d+)/$', views.delete_patient_matches, name="delete_a_case"),
 
     # ex: settings/
     url(r'^settings/$', views.settings, name='settings'),
