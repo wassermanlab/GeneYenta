@@ -32,6 +32,7 @@
                 	<th>Year</th>
                 	<th>Last Modified</th>
                 	<th></th>
+                	<th></th>
             	 </tr>
           	</thead>
           	<tbody>
@@ -46,6 +47,9 @@
 					<td>
 						<a href="{% url 'cases.views.patient_detail' p.id %}"> Detail
 						</a>
+					</td>
+					<td>
+						<a href="/matches/view-matches?from_case=True&patient_id={{p.id}}">Matches</a>
 					</td>
 				</tr>
 			{% endfor %}
