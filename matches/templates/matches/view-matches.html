@@ -40,8 +40,11 @@
 		</h4>
 	</li>
 
-
-		<div id="list{{patient_id_key}}" class="collapse out">
+		{% if from_case %}
+			<div id="list{{patient_id_key}}" class="collapse in">
+		{% else %}
+			<div id="list{{patient_id_key}}" class="collapse out">
+		{% endif %}	
 			<table class="sortable table table-condensed">
 				<thead>
 					<tr>
