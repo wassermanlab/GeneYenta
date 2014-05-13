@@ -12,7 +12,7 @@
 
 <div class="row">
 	<div class="col-lg-8 col-offset-1 col-12">
-		<h5><small>Click on the headers below to see the matches for each patient.</small></h5>
+		<h4>Click on the headers below to see the matches for each patient.</h4>
 	</div>
 	<div class="col-lg-3 col-12">
 		{% if from_case %}
@@ -30,7 +30,7 @@
 {% if match_dict %}
 	{% for patient_id_key, match_list in match_dict.items %}
 	<li>
-		<h4 data-toggle="collapse" data-target="#list{{patient_id_key}}">
+		<h4 data-toggle="collapse" data-target="#list{{patient_id_key}}" onmouseover='nhpup.popup("Click to show more matches.")'>
 			Matches for with GeneYenta ID: {{patient_id_key}}	
 			<small>
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
