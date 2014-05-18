@@ -75,7 +75,7 @@ class ClinicianForm(forms.ModelForm):
 	description = forms.CharField(widget=forms.Textarea,max_length=2500, required=False)
 	email = forms.CharField(label='Email*',validators=[validate_email],
 							error_messages={'invalid': ('Enter a valid email address.')})
-	phone = forms.CharField(validators=[validate_phone_number_format])
+	phone = forms.CharField(validators=[validate_phone_number_format], required=False)
 	captcha = CaptchaField()
 	
 	def __init__(self, *args, **kwargs):
