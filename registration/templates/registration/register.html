@@ -6,8 +6,8 @@
 {% block content %}
 
 		<div class="col-lg-6">
-			{% if form.errors %}
-			{{form.errors}}
+			{% if userform.errors or userprofileform.errors %}
+				<div style="color:red;">The following errors occurred. Please correct them and resubmit.</div>
 			{% endif %}
 
 			<form method="POST">
@@ -31,7 +31,7 @@
 					<div class="col-lg-3">
 						{{field}}
 					</div>
-					<div class="col-lg-6">
+					<div class="col-lg-6" style="color:red;">
 						{{ field.errors }}
 					</div>
 				</div>
@@ -62,7 +62,7 @@
 				<div class="col-lg-3">
 					{{field}}
 				</div>
-				<div class="col-lg-6">
+				<div class="col-lg-6" style="color:red;">
 					{{ field.errors }}
 				</div>
 			</div>
