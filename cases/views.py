@@ -15,6 +15,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import redirect
+from django.http import HttpResponse
 
 #Model-Related Imports
 from django.contrib.auth.models import User
@@ -199,6 +200,7 @@ def profile_edit(request, clinician_id):
     else:
         return forbidden_request(request)
 
+
 # View: archives
 # Allows the user to unarchive previously archived patients
 @login_required(login_url=LOGIN_REQUIRED_URL)
@@ -221,6 +223,10 @@ def archives(request):
     else:
         return forbidden_request(request)
 
+@login_required(login_url=LOGIN_REQUIRED_URL)
+def keep_session_alive(request):
+    return HttpResponse("OK")
+    
 
 
 #Private Helper Functions
