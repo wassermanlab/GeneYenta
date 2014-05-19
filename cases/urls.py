@@ -10,6 +10,8 @@ urlpatterns = patterns('',
     
     # ex: create-case/
     url(r'^create-case/$', views.create_case, name='create_case'),
+    
+    url(r'^keep-session-alive/$', views.keep_session_alive, name='keep-session'),
 
     # ex: view-cases/
     url(r'^view-cases/$', views.view_cases, name='view_cases'),
