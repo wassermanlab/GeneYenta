@@ -63,7 +63,7 @@ class Clinician(models.Model):
 
 class UserForm(forms.ModelForm):
 	email = forms.CharField(required=True, validators=[validate_email_unique])
-	password = PasswordField(label="Password")
+	password = PasswordField(label="Password", help_text="Must contain 1 upper case letter, 1 lower case letter, 1 digit, 1 punctuation.")
 	
 	class Meta:
 		model = User
@@ -75,7 +75,7 @@ class ClinicianForm(forms.ModelForm):
 	description = forms.CharField(widget=forms.Textarea,max_length=2500, required=False)
 	email = forms.CharField(label='Email*',validators=[validate_email],
 							error_messages={'invalid': ('Enter a valid email address.')})
-	phone = forms.CharField(validators=[validate_phone_number_format], required=False)
+	phone = forms.CharField(validators=[validate_phone_number_format], required=False, help_text="Phone Number Format: xxx-xxx-xxxx")
 	captcha = CaptchaField()
 	
 	def __init__(self, *args, **kwargs):
