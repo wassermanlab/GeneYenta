@@ -58,6 +58,9 @@ class Clinician(models.Model):
 
 	def __unicode__(self):
 		return '{0} {1} {2}'.format(self.salutation, self.first_name, self.last_name)
+	
+	def full_name(self):
+		return self.first_name + ' ' + self.last_name
 
 # Form Classes
 
