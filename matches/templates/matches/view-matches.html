@@ -54,6 +54,7 @@
 						<th>Score</th>
 						<th>Other Patient's ID.</th>
 						<th></th>
+						<th></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -87,6 +88,7 @@
 					<td>{{m.score|to_percentage}}</td>
 					<td>{{m.matched_patient.id}}</td>
 					<td><a href="{% url 'matches.views.match_detail' m.id %}">Detail</a></td>
+					<td><a href="#" onclick="send_email('{{patient_id_key}}', '{{m.matched_patient.id}}', '{{m.matched_patient.clinician.email}}', '{{m.matched_patient.clinician}}', '{{profile.full_name}}', '{{profile.email}}', '{{profile.address1}}')">Great Match</a></td>
 				</tr>					
 				{% endfor %}
 				</tbody>
@@ -132,6 +134,22 @@
 	function show_modal(id, content){
 		$('#noteContent').text(content);
 		$(id).modal('show');
+	}
+	
+	function send_email(patient_id, matched_patient_id,matched_clinician_email, matched_clinician_name, name, email, address){
+
+		
+		var to_email = matched_clinician_email;
+		var subject = "GeneYenta: communication request regarding a great match to your case with GeneYenta ID " + matched_patient_id;
+		var body = "Dear " + matched_clinician_name + "%0D%0A%0D%0A";
+		body += "      I'm contacting you regarding your GeneYenta case " + matched_patient_id + " as it is a great match to my case " + patient_id + ".";
+		body += "If you are interested in comparing notes or collaborating on these similar cases, please feel free to contact me.%0D%0A%0D%0A";
+		body += "Sincerely,%0D%0A";
+		body += name+"%0D%0A";
+		body += email+"%0D%0A";
+		body += address
+		
+		window.location.href = "mailto:"+to_email+"?subject="+subject+"&body="+body;
 	}
 	
 	/* Function: async_post
