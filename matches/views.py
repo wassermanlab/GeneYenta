@@ -34,7 +34,7 @@ CREATE = False
 
 TOP_X_MATCHES = getattr(settings, "MATCHES_PAGE_TOP_X_MATCH", 5)
 MATCHES_PAGE_MINIMUM_SCORE = getattr(settings, "MATCHES_PAGE_MINIMUM_SCORE", 0.1)
-GREAT_BOTTON_THRESHOOLD = getattr(settings, "GREAT_MATCH_THRESHOLD", 0.8)
+GREAT_MATCH_THRESHOOLD = getattr(settings, "GREAT_MATCH_THRESHOLD", 0.8)
 
 # View: [view name]
 # [function description]
@@ -98,7 +98,7 @@ def view_matches(request, patient_id="", scroll_pixel=0):
 			 			'patient_id':patient_id,
 			 			'from_case_patient_id':from_case_patient_id,
 			 			'from_case':from_case,
-			 			'great_match_threshold':GREAT_BOTTON_THRESHOOLD
+			 			'great_match_threshold':GREAT_MATCH_THRESHOOLD
 			 		}
 			return render(request, 'matches/view-matches.html', context)
 		
@@ -236,6 +236,7 @@ def _organizePatients(user_patient, other_patient, user, profile):
 					'profile': profile,
 					'other_user': other_user,
 					'phenotypes': phenotypes,
+					'great_match_threshold':GREAT_MATCH_THRESHOOLD
 					}
 		return context
 
