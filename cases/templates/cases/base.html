@@ -145,8 +145,8 @@ var $countdown = $("#dialog-countdown");
 
 // start the idle timer plugin
 $.idleTimeout('#dialog', 'div.ui-dialog-buttonpane button:first', {
-	warningLength: 10,
-	idleAfter: 1750,
+	warningLength: 300,
+	idleAfter: 1500,
 	pollingInterval: 60,
 	keepAliveURL: '/cases/keep-session-alive',
 	serverResponseEquals: 'OK',
