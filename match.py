@@ -662,14 +662,18 @@ class GYMatcher:
 
         for patient1 in patients:
             for patient2 in patients:
-                if patient1.id < patient2.id \
-                   and patient1.clinician_id != patient2.clinician_id:
-                        # Compute two-way patient to patient match below.
-                        # Skip iterations where patient1.id > patient2.id.
-                        # Don't match a patient to his/herself or match
-                        # patients belonging to the same clinician.
-                        self.matchPatientToPatient(patient1, patient2)
-                        self.matchPatientToPatient(patient2, patient1)
+                if patient1.id < patient2.id
+                   #
+                   # Now we will do patient matches for same clinician
+                   # DJA 2014/05/14
+                   # and patient1.clinician_id != patient2.clinician_id:
+                   #
+                   # Compute two-way patient to patient match below.
+                   # Skip iterations where patient1.id > patient2.id.
+                   # Don't match a patient to his/herself or match
+                   # patients belonging to the same clinician.
+                   self.matchPatientToPatient(patient1, patient2)
+                   self.matchPatientToPatient(patient2, patient1)
 
     def notifyMatchProcessTimedOut(self):
         msg = MIMEText("A GeneYenta matching process timed out waiting for a previous matching process to complete at {0}".format(datetime.now()))
