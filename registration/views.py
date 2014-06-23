@@ -29,6 +29,7 @@ import os
 import mimetypes
 from django.core.servers.basehttp import FileWrapper
 from django.http import HttpResponse
+import time
 # View: [view title]
 # [view description]
 
@@ -66,9 +67,18 @@ def registration(request):
 			message = 'Hello, You have registered for GeneYenta. \
 			You will be notified when your account has been approved.'
 			subject = 'Confirmation of GeneYenta Registration'
+			adminMessage='\
+			A new user has registered for the GeneYenta system. To approve this registration, please login to the admin interface at http://geneyenta.ca/admin. User details follow:\
+			User ID: ' + str(user.id) + '\
+			Name: ' + str(userprofile.full_name) + '\
+			Email: ' + str(userprofile.email) + '\
+			Date: ' + str(time.strftime("%d/%m/%Y"));
+			
+			adminSubject = "A new user is registered."
 			huamn = True
 			try:
 				send_mail(subject, message, EMAIL_HOST_USER, [user.email])
+				send_mail(adminSubject, adminMessage, EMAIL_HOST_USER, ['geneyenta_admin@cmmt.ubc.ca'])
 			except:
 				print('registration.views.registration error: Couldn\'t send email')
 			return HttpResponseRedirect('registration-success/')
