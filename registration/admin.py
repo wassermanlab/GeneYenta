@@ -5,6 +5,10 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from registration.models import Clinician
 
+# Send Mail Imports
+from django.core.mail import send_mail
+from geneyenta.settings import EMAIL_HOST_USER
+
 # Model Registration
 admin.site.register(Clinician) 
 
@@ -12,7 +16,12 @@ admin.site.register(Clinician)
 def activate_account(self, request, queryset): 
 	""" This action allows the admin to bulk activate multiple accounts."""
 	queryset.update(is_active=True)
-activate_account.short_description = "Activate selected user account(s)"
+	activate_account.short_description = "Activate selected user account(s)"
+	email = Clinician.objects.filter(user=queryset)[0].email
+	message = 'Hello, You have registered for GeneYenta. \
+	Your account is approved.'
+	subject = 'Approval of GeneYenta Registration'
+	send_mail(subject, message, EMAIL_HOST_USER, [email])
 
 def deactivate_account(self, request, queryset):
 	""" This actions allows the admin to bulk deactivate multple accounts."""
