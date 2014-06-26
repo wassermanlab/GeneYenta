@@ -64,15 +64,18 @@ def registration(request):
 			userprofile = clinician_form.save(commit=False)
 			userprofile.user = user
 			userprofile.save()
-			message = 'Hello, You have registered for GeneYenta. \
-			You will be notified when your account has been approved.'
+			message = "Hello:\r\n\
+			You have registered for GeneYenta. \r\n\
+			You will be notified when your account has been approved."
 			subject = 'Confirmation of GeneYenta Registration'
-			adminMessage='\
-			A new user has registered for the GeneYenta system. To approve this registration, please login to the admin interface at http://geneyenta.ca/admin. User details follow:\
-			User ID: ' + str(user.id) + '\
-			Name: ' + str(userprofile.full_name) + '\
-			Email: ' + str(userprofile.email) + '\
-			Date: ' + str(time.strftime("%d/%m/%Y"));
+			adminMessage="\
+			A new user has registered for the GeneYenta system. \r\n\
+			To approve this registration, please login to the admin interface at http://geneyenta.ca/admin. \r\n\r\n\
+			User details follow:\r\n\r\n\
+			User ID: " + str(user.id) + "\r\n\
+			Name: " + userprofile.full_name() + "\r\n\
+			Email: " + str(userprofile.email) + "\r\n\
+			Date: " + str(time.strftime("%d/%m/%Y")) + "\r\n";
 			
 			adminSubject = "A new user is registered."
 			huamn = True

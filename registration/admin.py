@@ -17,9 +17,13 @@ def activate_account(self, request, queryset):
 	""" This action allows the admin to bulk activate multiple accounts."""
 	queryset.update(is_active=True)
 	activate_account.short_description = "Activate selected user account(s)"
-	email = Clinician.objects.filter(user=queryset)[0].email
-	message = 'Hello, You have registered for GeneYenta. \
-	Your account is approved.'
+	userprofile = Clinician.objects.filter(user=queryset)
+	email = userprofile[0].email
+	message = "Hello:\r\n\
+	You have registered for GeneYenta. \r\n\
+	Your account is approved.\r\n\
+	Please login to your account here: http://geneyenta.ca \r\n\
+	Your username is: " + queryset[0].username
 	subject = 'Approval of GeneYenta Registration'
 	send_mail(subject, message, EMAIL_HOST_USER, [email])
 

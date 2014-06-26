@@ -80,6 +80,7 @@ class ClinicianForm(forms.ModelForm):
 	email = forms.CharField(label='Email*',validators=[validate_email],
 							error_messages={'invalid': ('Enter a valid email address.')})
 	phone = forms.CharField(validators=[validate_phone_number_format], required=False, help_text="Phone Number Format: xxx-xxx-xxxx")
+	extension = forms.CharField(required=False)
 	captcha = CaptchaField()
 	
 	def __init__(self, *args, **kwargs):
@@ -87,7 +88,8 @@ class ClinicianForm(forms.ModelForm):
 		self.fields['description'].label='Research Summary'
 		del self.fields['user']
 		for key in self.fields:
-			if key != 'description' and key != 'address2' and key != 'user' and key!='email' and key!='phone' and key!='captcha':
+			if key != 'description' and key != 'address2' and key != 'user' \
+			and key!='email' and key!='phone' and key!='extension' and key!='captcha':
 				self.fields[key].label = self.fields[key].label + '*'
     
 	class Meta:
