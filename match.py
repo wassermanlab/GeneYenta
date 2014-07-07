@@ -60,7 +60,7 @@ GY_DB_USER = 'gyadmin'
 GY_DB_PASS = 'gnytdmpw'
 GY_DB_NAME = 'GeneYenta'
 
-NO_MATCH = -1
+NO_MATCH_SCORE = -1
 PROCESS_RETRIES = 10    # number of times to try match processing
 PROCESS_WAIT_TIME = 60  # number of seconds to wait between each
                         # match processing attempt
@@ -473,10 +473,10 @@ class GYMatcher:
 
         """
 
-        #print "Getting match percent for patients {0} and {1}".format(
-        #    patient1.id,
-        #    patient2.id
-        #)
+        print "Getting match percent for patients {0} and {1}".format(
+            patient1.id,
+            patient2.id
+        )
 
         if not patient1.terms:
             self.fetchPatientPhenoTerms(patient1)
@@ -512,11 +512,7 @@ class GYMatcher:
         matchNumerator = 0
         matchDenominator = 0
         for p1_term in patient1.terms:
-            #print "term {0}: term_score = {1} clinician_score = {2}".format(
-            #    p1_term.id,
-            #    p1_term.term_score,
-            #    p1_term.clinician_score
-            #)
+            print "term to match = {0}".format(p1_term)
 
             matchDenominator += (p1_term.clinician_score * p1_term.term_score)
 
@@ -525,7 +521,8 @@ class GYMatcher:
             )
 
             if best_match:
-                #print "best term match = {0}".format(best_match)
+                print "best term match = {0}".format(best_match)
+
                 matchNumerator += (
                     p1_term.clinician_score * best_match.term_score
                 )
@@ -534,8 +531,8 @@ class GYMatcher:
                 #print "WARNING: term {0} not matched!!!".format(p1_term)
                 logging.error("term {0} not matched!!!".format(p1_term))
 
-        #print "match numerator {0}".format(matchNumerator)
-        #print "match denominator {0}".format(matchDenominator)
+        print "match numerator {0}".format(matchNumerator)
+        print "match denominator {0}".format(matchDenominator)
 
         match_score = 0
         if matchDenominator > 0:
@@ -557,9 +554,11 @@ class GYMatcher:
         """
 
         best_match = None
-        if term in term_set:
-            # Term directly matches a term in the term_set, so return it.
-            best_match = term
+        for term2 in term_set:
+            if term2.id == term.id:
+                # Term directly matches a term in the term_set, so return it.
+                best_match = term2
+                break
 
         if not best_match:
             # If term does not directly match a term in the term_set, find
@@ -568,20 +567,21 @@ class GYMatcher:
             if not term.ancestors:
                 self.fetchPhenoTermAncestors(term)
 
-            best_score = NO_MATCH
+            best_score = NO_MATCH_SCORE
             for ancestor in term.ancestors:
-                if ancestor in term_set:
-                    if ancestor.term_score > best_score:
-                        # NOTE: the ancestor terms are stored sorted in the
-                        # database and are sorted by highest to lowest score
-                        # on retrieval (just to be sure), so we *should* be
-                        # able to just return the first match.
-                        best_score = ancestor.term_score
-                        best_match = ancestor
+                for term2 in term_set:
+                    if term2.id == ancestor.id:
+                        if ancestor.term_score > best_score:
+                            # NOTE: the ancestor terms are stored sorted in the
+                            # database and are sorted by highest to lowest score
+                            # on retrieval (just to be sure), so we *should* be
+                            # able to just return the first match.
+                            best_score = ancestor.term_score
+                            best_match = ancestor
             
         return best_match
 
-    def matchPatientToPatient(self, patient1, patient2):
+    def matchPatientToPatient(self, patient1, patient2, force):
         """
         Compute the one-way match score from patient1 to patient2 based on
         their phenotype terms and update the database accordingly.
@@ -596,9 +596,16 @@ class GYMatcher:
         existing_match = self.fetchMatch(patient1, patient2)
 
         if existing_match:
-            is_up_to_date_match = self.isUpToDateMatch(
-                existing_match, patient1, patient2
-            )
+            is_up_to_date_match = False
+
+            #
+            # If force match is set, do matching regardless of whether a match
+            # already exists and is up to date.
+            #
+            if not force:
+                is_up_to_date_match = self.isUpToDateMatch(
+                    existing_match, patient1, patient2
+                )
 
             if is_up_to_date_match:
                 #print "Existing match {0} is up to date".format(existing_match)
@@ -633,7 +640,7 @@ class GYMatcher:
             self.insertMatch(new_match)
             self.new_matches.append(new_match)
 
-    def matchPatientToAll(self, patient):
+    def matchPatientToAll(self, patient, force):
         """
         Compute matches of the given patient to all other patients in the
         GeneYenta DB and update the database accordingly. Do not match
@@ -645,13 +652,16 @@ class GYMatcher:
         patients = self.fetchAllPatients()
 
         for other_patient in patients:
-            if other_patient.id != patient.id \
-               and other_patient.clinician_id != patient.clinician_id:
-                    # Do two-way matching
-                    self.matchPatientToPatient(patient, other_patient)
-                    self.matchPatientToPatient(other_patient, patient)
+            if other_patient.id != patient.id:
+                #
+                # Now we will do patient matches for same clinician
+                # DJA 2014/05/14
+                # and patient1.clinician_id != patient2.clinician_id:
+                #
+                self.matchPatientToPatient(patient, other_patient, force)
+                self.matchPatientToPatient(other_patient, patient, force)
 
-    def matchAllPatients(self):
+    def matchAllPatients(self, force):
         """
         Compute matches of all patients to all other patients in the
         GeneYenta DB and update the database accordingly.
@@ -662,18 +672,18 @@ class GYMatcher:
 
         for patient1 in patients:
             for patient2 in patients:
-                if patient1.id < patient2.id
-                   #
-                   # Now we will do patient matches for same clinician
-                   # DJA 2014/05/14
-                   # and patient1.clinician_id != patient2.clinician_id:
-                   #
-                   # Compute two-way patient to patient match below.
-                   # Skip iterations where patient1.id > patient2.id.
-                   # Don't match a patient to his/herself or match
-                   # patients belonging to the same clinician.
-                   self.matchPatientToPatient(patient1, patient2)
-                   self.matchPatientToPatient(patient2, patient1)
+                if patient1.id < patient2.id:
+                    #
+                    # Compute two-way patient to patient match below.
+                    # Skip iterations where patient1.id > patient2.id.
+                    # Don't match a patient to his/herself.
+                    #
+                    # Now we will do patient matches for same clinician
+                    # DJA 2014/05/14
+                    # and patient1.clinician_id != patient2.clinician_id:
+                    #
+                    self.matchPatientToPatient(patient1, patient2, force)
+                    self.matchPatientToPatient(patient2, patient1, force)
 
     def notifyMatchProcessTimedOut(self):
         msg = MIMEText("A GeneYenta matching process timed out waiting for a previous matching process to complete at {0}".format(datetime.now()))
@@ -700,8 +710,12 @@ def main():
     )
 
     parser.add_argument('-id', '--patient_id', nargs='?', const=0, default=0)
+    parser.add_argument('-id2', '--patient_id2', nargs='?', const=0, default=0)
+    parser.add_argument('-f', '--force', action='store_true')
     args = parser.parse_args()
     patient_id = args.patient_id
+    patient_id2 = args.patient_id2
+    force_match = args.force
 
     m = GYMatcher()
     
@@ -722,9 +736,13 @@ def main():
 
         if patient_id:
             patient = m.fetchPatient(patient_id)
-            m.matchPatientToAll(patient)
+            if patient_id2:
+                patient2 = m.fetchPatient(patient_id2)
+                m.matchPatientToPatient(patient, patient2, force_match)
+            else:
+                m.matchPatientToAll(patient, force_match)
         else:
-            m.matchAllPatients()
+            m.matchAllPatients(force_match)
 
         m.setMatchProcessFinished()
 
