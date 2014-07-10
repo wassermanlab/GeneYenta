@@ -105,9 +105,9 @@ def view_matches(request, patient_id="", scroll_pixel=0):
 			return render(request, 'matches/view-matches.html', context)
 		
 def _getDateSize(request, total_size):		
-	if request.session.get('match_size_multiplier', 1) == 1:
-		retVal = 1 * TOP_X_MATCHES
-		request.session['match_size_multiplier'] = 2
+	if request.session.get('match_size_multiplier', 2) == 2:
+		retVal = 2 * TOP_X_MATCHES
+		request.session['match_size_multiplier'] = 3
 		return retVal
 	else:
 		multiplier = request.session.get('match_size_multiplier')
