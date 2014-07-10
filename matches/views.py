@@ -36,6 +36,8 @@ TOP_X_MATCHES = getattr(settings, "MATCHES_PAGE_TOP_X_MATCH", 5)
 MATCHES_PAGE_MINIMUM_SCORE = getattr(settings, "MATCHES_PAGE_MINIMUM_SCORE", 0.1)
 GREAT_MATCH_THRESHOLD = getattr(settings, "GREAT_MATCH_THRESHOLD", 0.8)
 
+MATCH_DISPLAY_SIZE_MULTIPLIER = 0
+
 # View: [view name]
 # [function description]
 
@@ -79,7 +81,7 @@ def view_matches(request, patient_id="", scroll_pixel=0):
 			if from_case:
 				users_matches = _getMatchesByPatientId(from_case_patient_id, more_data)				
 			else:
-				users_matches = _getMatches(user.clinician.id, more_data)
+				users_matches = _getMatches(user.clinician.id, more_data, request)
 				
 
 			#This dictionary maps each patient id to an array of matches for that patient.
@@ -102,6 +104,21 @@ def view_matches(request, patient_id="", scroll_pixel=0):
 			 		}
 			return render(request, 'matches/view-matches.html', context)
 		
+def _getDateSize(request, total_size):		
+	if request.session.get('match_size_multiplier', 1) == 1:
+		retVal = 1 * TOP_X_MATCHES
+		request.session['match_size_multiplier'] = 2
+		return retVal
+	else:
+		multiplier = request.session.get('match_size_multiplier')
+		request.session['match_size_multiplier']=multiplier+1
+		retval = multiplier * TOP_X_MATCHES
+		if retval > total_size:
+			return total_size;
+		else:
+			return retval
+		
+	
 def _mergeDataFromSession(request_session, key, appended_data):
 	if request_session.get(key):
 		data_in_session = request_session.get(key);
@@ -120,10 +137,11 @@ def _getMatchesByPatientId(patient_id, more_data):
 	return users_matches;
 		
 		
-def _getMatches(user_id, more_data):
+def _getMatches(user_id, more_data, request):
 	user_clinician = Clinician.objects.filter(id=user_id)
+	total_record_size = Patient.objects.filter(clinician=user_clinician).count()
 	if more_data:
-		matched_patient = Patient.objects.filter(clinician=user_clinician).order_by('id')
+		matched_patient = Patient.objects.filter(clinician=user_clinician).order_by('id')[:_getDateSize(request, total_record_size)]
 	else:
 		matched_patient = Patient.objects.filter(clinician=user_clinician).order_by('id')[:TOP_X_MATCHES]
 		
