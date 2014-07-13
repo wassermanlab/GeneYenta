@@ -36,7 +36,6 @@ TOP_X_MATCHES = getattr(settings, "MATCHES_PAGE_TOP_X_MATCH", 5)
 MATCHES_PAGE_MINIMUM_SCORE = getattr(settings, "MATCHES_PAGE_MINIMUM_SCORE", 0.1)
 GREAT_MATCH_THRESHOLD = getattr(settings, "GREAT_MATCH_THRESHOLD", 0.8)
 
-MATCH_DISPLAY_SIZE_MULTIPLIER = 0
 
 # View: [view name]
 # [function description]
@@ -79,7 +78,7 @@ def view_matches(request, patient_id="", scroll_pixel=0):
 
 
 			if from_case:
-				users_matches = _getMatchesByPatientId(from_case_patient_id, more_data)				
+				users_matches = _getMatchesByPatientId(request, from_case_patient_id, more_data)				
 			else:
 				users_matches = _getMatches(user.clinician.id, more_data, request)
 				
@@ -128,11 +127,22 @@ def _mergeDataFromSession(request_session, key, appended_data):
 		request_session[key] = appended_data;
 		return appended_data
 	
-def _getMatchesByPatientId(patient_id, more_data):
+def _getMatchesByPatientId(request, patient_id, more_data):
+
+	total_record_size = Match.objects.filter(patient__id=patient_id)\
+						.filter(patient__is_archived=False)\
+						.filter(matched_patient__isnull=False).count()
+	
 	if more_data:
-		users_matches = Match.objects.filter(patient__id=patient_id).filter(patient__is_archived=False).filter(matched_patient__isnull=False).order_by('-last_matched')
+		users_matches = Match.objects.filter(patient__id=patient_id)\
+						.filter(patient__is_archived=False)\
+						.filter(matched_patient__isnull=False)\
+						.order_by('-last_matched')[:_getDateSize(request, total_record_size)]
 	else:
-		users_matches = Match.objects.filter(patient__id=patient_id).filter(patient__is_archived=False).filter(matched_patient__isnull=False).filter(score__gt=MATCHES_PAGE_MINIMUM_SCORE).order_by('-last_matched')
+		users_matches = Match.objects.filter(patient__id=patient_id)\
+						.filter(patient__is_archived=False)\
+						.filter(matched_patient__isnull=False)\
+						.filter(score__gt=MATCHES_PAGE_MINIMUM_SCORE).order_by('-last_matched')[:TOP_X_MATCHES]
 		
 	return users_matches;
 		
