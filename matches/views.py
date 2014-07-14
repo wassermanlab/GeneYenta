@@ -12,6 +12,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.db.models import Q
 
 #Model-related Imports
 from django.contrib.auth.models import User
@@ -76,7 +77,8 @@ def view_matches(request, patient_id="", scroll_pixel=0):
 		else:
 			profile = user.clinician
 
-
+			
+			patient_list = _getPatientList(request)
 			if from_case:
 				users_matches = _getMatchesByPatientId(request, from_case_patient_id, more_data)				
 			else:
@@ -97,11 +99,18 @@ def view_matches(request, patient_id="", scroll_pixel=0):
 			 			'important_dict': important_match_totals,
 			 			'scroll_pixel':scroll_pixel,
 			 			'patient_id':patient_id,
+			 			'patient_list':patient_list,
 			 			'from_case_patient_id':from_case_patient_id,
 			 			'from_case':from_case,
 			 			'great_match_threshold':GREAT_MATCH_THRESHOLD
 			 		}
 			return render(request, 'matches/view-matches.html', context)
+		
+def _getPatientList(request):
+	if(request.session.get('patient_list') is not None):
+		return request.session.get('patient_list')
+	else:
+		return list()
 		
 def _getDateSize(request, total_size):		
 	if request.session.get('match_size_multiplier', 2) == 2:
@@ -134,12 +143,17 @@ def _getMatchesByPatientId(request, patient_id, more_data):
 						.filter(matched_patient__isnull=False).count()
 	
 	if more_data:
-		users_matches = Match.objects.filter(patient__id=patient_id)\
+		#users_matches = Match.objects.filter(patient__id=patient_id)\
+		#				.filter(patient__is_archived=False)\
+		#				.filter(matched_patient__isnull=False)\
+		#				.order_by('-last_matched')[:_getDateSize(request, total_record_size)]
+		
+		users_matches = Match.objects.filter(Q(patient__id=patient_id) | Q(matched_patient__id=patient_id))\
 						.filter(patient__is_archived=False)\
 						.filter(matched_patient__isnull=False)\
-						.order_by('-last_matched')[:_getDateSize(request, total_record_size)]
+						.order_by('-last_matched')
 	else:
-		users_matches = Match.objects.filter(patient__id=patient_id)\
+		users_matches = Match.objects.filter(Q(patient__id=patient_id) | Q(matched_patient__id=patient_id))\
 						.filter(patient__is_archived=False)\
 						.filter(matched_patient__isnull=False)\
 						.filter(score__gt=MATCHES_PAGE_MINIMUM_SCORE).order_by('-last_matched')[:TOP_X_MATCHES]
@@ -153,6 +167,7 @@ def _getMatches(user_id, more_data, request):
 	if more_data:
 		matched_patient = Patient.objects.filter(clinician=user_clinician).order_by('id')[:_getDateSize(request, total_record_size)]
 	else:
+		request.session['match_size_multiplier']=2
 		matched_patient = Patient.objects.filter(clinician=user_clinician).order_by('id')[:TOP_X_MATCHES]
 		
 	patient_list=list()

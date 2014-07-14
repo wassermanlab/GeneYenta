@@ -49,6 +49,7 @@ def view_cases(request):
     if user.is_authenticated() and user.is_active:
         profile = user.clinician
         patient_list = profile.patient_set.filter(is_archived=False)
+        request.session['patient_list'] = list(patient_list.values_list('id'))
         context = {'user': user,
                     'profile': profile,
                     'patient_list': patient_list,}

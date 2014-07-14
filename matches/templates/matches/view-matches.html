@@ -1,107 +1,94 @@
 {% extends 'cases/base.html' %}
 {% load dict_variable_key_filter %}
 
-
 {% block title %}GeneYenta Matches{% endblock %}
 
 {% block header %}Your Matches{% endblock %}
 
-
-
-{% block content %} 
+{% block content %}
 
 <div class="row">
-	<div class="col-lg-8 col-offset-1 col-12">
+	<div class="col-lg-6 col-offset-1 col-12">
 		<h4>Click on the headers below to see the matches for each patient.</h4>
 	</div>
-	<div class="col-lg-3 col-12">
+	<div class="col-lg-2 col-12">
 		{% if from_case %}
 		<a class="btn btn-default" href="/matches/view-matches/?from_case=True&patient_id={{from_case_patient_id}}&more=true">Display More Matches</a>
 		{% else %}
 		<a class="btn btn-default" href="/matches/view-matches/?more=true">Display More Matches</a>
-		{% endif %}	
-		
+		{% endif %}
+
+	</div>
+	<div class="col-lg-2 col-12">
+		<button id="selfMatchedBtn" class="btn special-btn">Self-Match</button>
 	</div>
 </div>
 
 <div class="row">
 	<div class="col-lg-10 col-offset-1 col-12">
 
-{% if match_dict %}
-	{% for patient_id_key, match_list in match_dict.items %}
-	<li>
-		<h4 data-toggle="collapse" data-target="#list{{patient_id_key}}" onmouseover='nhpup.popup("Click to show more matches.")'>
-			Matches for with GeneYenta ID: {{patient_id_key}}	
-			<small>
-				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-				New (<div class="notification">{{unread_dict|get_item:patient_id_key}}</div>)
-				Important(<div id="important-counter-{{patient_id_key}}" class="notification">{{important_dict|get_item:patient_id_key}}</div>)
-			</small>
-		</h4>
-	</li>
+		{% if match_dict %}
+		{% for patient_id_key, match_list in match_dict.items %}
+		<div {{patient_id_key|is_this_the_patient_id:from_case_patient_id}}>
+			<li >
+				<h4 data-toggle="collapse" data-target="#list{{patient_id_key}}" onmouseover='nhpup.popup("Click to show more matches.")'> Matches for with GeneYenta ID: {{patient_id_key}} <small> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					New (
+					<div class="notification">
+						{{unread_dict|get_item:patient_id_key}}
+					</div>)
+					Important(
+					<div id="important-counter-{{patient_id_key}}" class="notification">
+						{{important_dict|get_item:patient_id_key}}
+					</div>) </small></h4>
+			</li>
 
-		{% if from_case %}
-			<div id="list{{patient_id_key}}" class="collapse in">
-		{% else %}
-			<div id="list{{patient_id_key}}" class="collapse out">
-		{% endif %}	
-			<table class="sortable table table-condensed">
-				<thead>
-					<tr>
-						<th>Important?</th>
-						<th>Date Matched</th>
-						<th>Your Notes</th>
-						<th>Score</th>
-						<th>Other Patient's ID.</th>
-						<th></th>
-						<th></th>
-					</tr>
-				</thead>
-				<tbody>
-				{% for m in match_list %}
-					{% if m.is_read %}
+			<div id="list{{patient_id_key}}" class="{{from_case|is_from_case}}">
+
+				<table class="sortable table table-condensed">
+					<thead>
 						<tr>
-					{% else %}
-						<tr class="unread">					
-					{% endif %}
+							<th>Important?</th>
+							<th>Date Matched</th>
+							<th>Your Notes</th>
+							<th>Score</th>
+							<th>Other Patient's ID.</th>
+							<th></th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for m in match_list %}
+						<tr {{m.is_read|is_read}}>
 
-					{% if m.is_important %}
-					<td sorttable_customkey="1">
-					{% else %}	
-					<td sorttable_customkey="0">
-					{% endif %}	
+							{% if m.is_important %}
+							<td sorttable_customkey="1"> {% else %} <td sorttable_customkey="0"> {% endif %}
+							<form name='mark-important-form' method="POST" sorttable_customkey="2">
+								{% if m.is_important %}
+								<input type="checkbox" onclick="async_post(this);" name="{{m.patient}}" value="{{m.id}}" checked/>
+								{% else %}
+								<input type="checkbox" onclick="async_post(this);" name="{{m.patient}}" value="{{m.id}}"/>
+								{% endif %}
+							</form></td>
 
-						<form name='mark-important-form' method="POST" sorttable_customkey="2"> 		{% if m.is_important %}
-								<input type="checkbox" onclick="async_post(this);" name="{{m.patient}}" value="{{m.id}}" checked/>	
-							{% else %}
-								<input type="checkbox" onclick="async_post(this);" name="{{m.patient}}" value="{{m.id}}"/>	
-							{% endif %}	
-						</form> 
-					
-					</td>
+							<td>{{m.last_matched}}</td>
 
-					<td>{{m.last_matched}}</td>
-					
-					<td>
-						<a onclick="show_modal('#view_notes', '{{m.notes}}')" href="#">Notes</a>
-					</td>
-					<td>{{m.score|to_percentage}}</td>
-					<td>{{m.matched_patient.id}}</td>
-					<td><a href="{% url 'matches.views.match_detail' m.id %}">Detail</a></td>
-					<td>
-					{% if m.score >= great_match_threshold %}
-						{% ssi "/apps/GeneYenta/matches/templates/matches/great-match-button.html" parsed%}
-					{% endif %}
-					</td>
-				</tr>					
-				{% endfor %}
-				</tbody>
-		</table>	
-	</div>
-	{% endfor %}
-{% else %}
-	<h4>There are no matches to display for your active cases.</h4>
-	<h5>Please note, if a case has been archived, you will not receive notifications of any potential matches for that case.</br> After unarchiving this case, all potential matches will be visible.</h5> 
+							<td><a onclick="show_modal('#view_notes', '{{m.notes}}')" href="#">Notes</a></td>
+							<td>{{m.score|to_percentage}}</td>
+							<td>{{m.matched_patient.id}}</td>
+							<td><a href="{% url 'matches.views.match_detail' m.id %}">Detail</a></td>
+							<td> {% if m.score >= great_match_threshold %}
+							{% ssi "/apps/GeneYenta/matches/templates/matches/great-match-button.html" parsed%}
+							{% endif %} </td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+		{% endfor %}
+		{% else %}
+		<h4>There are no matches to display for your active cases.</h4>
+		<h5>Please note, if a case has been archived, you will not receive notifications of any potential matches for that case.</br> After unarchiving this case, all potential matches will be visible.</h5>
 	</div>
 </div>
 {% endif %}
@@ -110,102 +97,110 @@
 
 {% endblock %}
 
-
-
-
 {% block endbody %}
 
 <script type="text/javascript">
+	$(document).ready(function() {
 
-	$(document).ready(function(){
-		
 		var scroll_pixel = {{scroll_pixel}};
 		var patient_id = '{{patient_id}}';
-		
-		if(patient_id!=""){
+
+		if (patient_id != "") {
 			var patient_id_objects = patient_id.split('-');
-			patient_id_objects.forEach(function(value){
-				$('#'+value).collapse('show');
+			patient_id_objects.forEach(function(value) {
+				$('#' + value).collapse('show');
 			});
-			
+
 		}
-		
-		if(scroll_pixel!=0){
+
+		if (scroll_pixel != 0) {
 			$(document).scrollTop(scroll_pixel);
 		}
 	});
-	
-	function show_modal(id, content){
+
+	function show_modal(id, content) {
 		$('#noteContent').text(content);
 		$(id).modal('show');
 	}
-	
-	function send_email(patient_id, matched_patient_id,matched_clinician_email, matched_clinician_name, name, email, address){
 
-		
+	function send_email(patient_id, matched_patient_id, matched_clinician_email, matched_clinician_name, name, email, address) {
+
 		var to_email = matched_clinician_email;
 		var subject = "GeneYenta: communication request regarding a great match to your case with GeneYenta ID " + matched_patient_id;
 		var body = "Dear " + matched_clinician_name + "%0D%0A%0D%0A";
 		body += "      I'm contacting you regarding your GeneYenta case " + matched_patient_id + " as it is a great match to my case " + patient_id + ".";
 		body += "If you are interested in comparing notes or collaborating on these similar cases, please feel free to contact me.%0D%0A%0D%0A";
 		body += "Sincerely,%0D%0A";
-		body += name+"%0D%0A";
-		body += email+"%0D%0A";
+		body += name + "%0D%0A";
+		body += email + "%0D%0A";
 		body += address
-		
-		window.location.href = "mailto:"+to_email+"?subject="+subject+"&body="+body;
+
+		window.location.href = "mailto:" + to_email + "?subject=" + subject + "&body=" + body;
 	}
-	
+
 	/* Function: async_post
-		Upon clicking the checkbox, a given match
-	notification is marked as important by submitting an ajax POST request to
-	the server that updates the DB models without refreshing the page.
-	*/
+	 Upon clicking the checkbox, a given match
+	 notification is marked as important by submitting an ajax POST request to
+	 the server that updates the DB models without refreshing the page.
+	 */
 	function async_post(input) {
-		var match_id = input.value; //GeneYenta ID AKA the match's primary key
-		var patient = input.name;  //the patient's GeneYenta/System ID 
+		var match_id = input.value;
+		//GeneYenta ID AKA the match's primary key
+		var patient = input.name;
+		//the patient's GeneYenta/System ID
 		var is_important = $(input).is(":checked");
 		$.ajax({
-                 type:"POST",
-                 url:"",
-                 data: {
-                 		'patient': patient,
-             			'status': is_important,
-                       	'match_id': match_id,
-                        'csrfmiddlewaretoken': '{{ csrf_token }}',
-                        },
-                 success: function(){
-                    var counter_id = '#important-counter-'+patient;
-	            	var n_important = $( "input[name="+patient+"]:checked" ).length;
-	    			$(counter_id).text(n_important);
-                 }
-            });
-            return false;
-	//TODO: set the custom key attribute to the appropriate value by calling get parentx2
+			type : "POST",
+			url : "",
+			data : {
+				'patient' : patient,
+				'status' : is_important,
+				'match_id' : match_id,
+				'csrfmiddlewaretoken' : '{{ csrf_token }}',
+			},
+			success : function() {
+				var counter_id = '#important-counter-' + patient;
+				var n_important = $("input[name=" + patient + "]:checked").length;
+				$(counter_id).text(n_important);
+			}
+		});
+		return false;
+		//TODO: set the custom key attribute to the appropriate value by calling get parentx2
 
 	}
 
+
 	$('a').click(function(event) {
-		if($(this).text()=='Detail'){
-			
+		if ($(this).text() == 'Detail') {
+
 			event.preventDefault();
 			var scrollToPixel = $(document).scrollTop();
 			var actualLink = $(this).attr('href');
 			var matchIDArray = [];
-			var matchedIdsObjects = $("[class='out in']").each(function(){matchIDArray.push(this.id);});
+			var matchedIdsObjects = $("[class='out in']").each(function() {
+				matchIDArray.push(this.id);
+			});
 			var matchedStrings = matchIDArray.join('-');
-			
-			document.location.href = actualLink+matchedStrings+'/'+scrollToPixel;
-			
+
+			document.location.href = actualLink + matchedStrings + '/' + scrollToPixel;
+
 		}
 	}); 
+	
+	var selfMatchedBtn = $('#selfMatchedBtn')
+	
+	selfMatchedBtn.on('click', function(){
+		selfMatchedBtn.toggleClass('active');
+		
+		if(selfMatchedBtn.hasClass('active')){
+			$('[id^=hide]').hide();
+		}else{
+			$('[id^=hide]').show();
+		}
+	})
 </script>
 
 <script type="text/javascript" src="{{STATIC_URL}}cases/js/popup.js"></script>
 <script src="{{STATIC_URL}}cases/js/sorttable.js"></script>
 {% endblock %}
-
-
-
-
 
