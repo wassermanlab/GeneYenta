@@ -29,7 +29,7 @@
 
 		{% if match_dict %}
 		{% for patient_id_key, match_list in match_dict.items %}
-		<div {{patient_id_key|is_this_the_patient_id:from_case_patient_id}}>
+
 			<li >
 				<h4 data-toggle="collapse" data-target="#list{{patient_id_key}}" onmouseover='nhpup.popup("Click to show more matches.")'> Matches for with GeneYenta ID: {{patient_id_key}} <small> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 					New (
@@ -58,7 +58,7 @@
 					</thead>
 					<tbody>
 						{% for m in match_list %}
-						<tr {{m.is_read|is_read}}>
+						<tr {{m.is_read|is_read}} {{patient_list|is_matched_patient_id_in_patient_list:m.matched_patient.id}}>
 
 							{% if m.is_important %}
 							<td sorttable_customkey="1"> {% else %} <td sorttable_customkey="0"> {% endif %}
@@ -84,7 +84,6 @@
 					</tbody>
 				</table>
 			</div>
-		</div>
 		{% endfor %}
 		{% else %}
 		<h4>There are no matches to display for your active cases.</h4>
