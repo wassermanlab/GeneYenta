@@ -12,7 +12,6 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.db.models import Q
 
 #Model-related Imports
 from django.contrib.auth.models import User
@@ -148,12 +147,12 @@ def _getMatchesByPatientId(request, patient_id, more_data):
 		#				.filter(matched_patient__isnull=False)\
 		#				.order_by('-last_matched')[:_getDateSize(request, total_record_size)]
 		
-		users_matches = Match.objects.filter(Q(patient__id=patient_id) | Q(matched_patient__id=patient_id))\
+		users_matches = Match.objects.filter(patient__id=patient_id)\
 						.filter(patient__is_archived=False)\
 						.filter(matched_patient__isnull=False)\
 						.order_by('-last_matched')
 	else:
-		users_matches = Match.objects.filter(Q(patient__id=patient_id) | Q(matched_patient__id=patient_id))\
+		users_matches = Match.objects.filter(patient__id=patient_id)\
 						.filter(patient__is_archived=False)\
 						.filter(matched_patient__isnull=False)\
 						.filter(score__gt=MATCHES_PAGE_MINIMUM_SCORE).order_by('-last_matched')[:TOP_X_MATCHES]
