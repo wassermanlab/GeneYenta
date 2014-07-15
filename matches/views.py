@@ -152,6 +152,7 @@ def _getMatchesByPatientId(request, patient_id, more_data):
 						.filter(matched_patient__isnull=False)\
 						.order_by('-last_matched')[:_getDateSize(request, total_record_size)]
 	else:
+		request.session['match_size_multiplier']=2
 		users_matches = Match.objects.filter(patient__id=patient_id)\
 						.filter(patient__is_archived=False)\
 						.filter(matched_patient__isnull=False)\
