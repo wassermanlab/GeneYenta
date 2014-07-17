@@ -150,13 +150,13 @@ def _getMatchesByPatientId(request, patient_id, more_data):
 		users_matches = Match.objects.filter(patient__id=patient_id)\
 						.filter(patient__is_archived=False)\
 						.filter(matched_patient__isnull=False)\
-						.order_by('-last_matched')[:_getDateSize(request, total_record_size)]
+						.order_by('-score')[:_getDateSize(request, total_record_size)]
 	else:
 		request.session['match_size_multiplier']=2
 		users_matches = Match.objects.filter(patient__id=patient_id)\
 						.filter(patient__is_archived=False)\
 						.filter(matched_patient__isnull=False)\
-						.filter(score__gt=MATCHES_PAGE_MINIMUM_SCORE).order_by('-last_matched')[:TOP_X_MATCHES]
+						.order_by('-score')[:TOP_X_MATCHES]
 		
 	return users_matches;
 		
