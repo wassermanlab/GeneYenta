@@ -242,17 +242,17 @@ def keep_session_alive(request):
 # vs. submits new data 
 def _process_phenotypes(request, patient, getlist_key, flag):
     # Phenotype object processing
-    json_str = str(request.POST.getlist(getlist_key)) #gets json as string
+    json_str = str(request.POST.get(getlist_key)) #gets json as string
     #print json_str
-    processed = json_str.replace("[u\'","",1) #removes unecessary prefix [u'
+    #processed = json_str.replace("[u\'","",1) #removes unecessary prefix [u'
     #print processed
-    if flag is EDIT:
-        processed = processed.replace("\', u\'\']","",1) #removes uncessary suffix ',u'']
-    else:
-        processed = processed.replace("\']","",1) #removes uncessary suffix ',u'']
+    #if flag is EDIT:
+    #    processed = processed.replace("\', u\'\']","",1) #removes uncessary suffix ',u'']
+    #else:
+    #    processed = processed.replace("\']","",1) #removes uncessary suffix ',u'']
     #print processed
     # only after processing will it be successfully converted to an array of dictionaries
-    json_data = json.loads(processed)
+    json_data = json.loads(json_str)
     for term in json_data: #iterates through array
         phenotype = Phenotype() #creates object
         phenotype.relevancy_score = int(term['importance'])
