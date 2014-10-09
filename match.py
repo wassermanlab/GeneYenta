@@ -67,7 +67,7 @@ PROCESS_WAIT_TIME = 60  # number of seconds to wait between each
 LOG_FILE = '/apps/GeneYenta/logs/match_process.log'
 
 # XXX set up gyadmin e-mail and update
-ADMIN_EMAIL = 'dave@cmmt.ubc.ca'
+ADMIN_EMAIL = 'geneyenta_admin@geneyenta.cmmt.ubc.ca'
 
 
 logging.basicConfig(filename=LOG_FILE, level=logging.INFO)
@@ -178,8 +178,15 @@ class GYMatcher:
 
         self.db = db
 
-        self.new_matches = []
-        self.updated_matches = []
+        #
+        # XXX
+        # Do not store matches! It will blow up the system (run out of
+        # memory when there are a large number of matches).
+        # DJA 2014/08/07
+        # XXX
+        #
+        #self.new_matches = []
+        #self.updated_matches = []
 
     def isMatchProcessing(self):
         """
@@ -355,33 +362,39 @@ class GYMatcher:
 
         return match
 
-    def fetchAllMatches(self):
-        """
-        Fetch all Match records from the matches_match table of the
-        GeneYenta DB.
-        Returns a list of Match objects.
-
-        """
-
-        sql = "SELECT id, patient_id, matched_patient_id, is_read, " \
-              "is_important, score, last_matched, notes " \
-              "FROM matches_match"
-        cur = self.db.cursor()
-        cur.execute(sql)
-        rows = cur.fetchall()
-        matches = []
-        for row in rows:
-            #print row
-            #dt = datetime.strptime(row[6], "%Y-%m-%d %H:%M:%S")
-            matches.append(
-                Match(
-                    #row[0], row[1], row[2], row[3], row[4], row[5], dt, row[7]
-                    row[0], row[1], row[2], row[3], row[4], row[5], row[6],
-                    row[7]
-                )
-            )
-
-        return matches
+#    def fetchAllMatches(self):
+#        """
+#        XXX
+#        Do not use this method! It will blow up the system (run out of
+#        memory when there are a large number of matches).
+#        DJA 2014/08/07
+#        XXX
+#
+#        Fetch all Match records from the matches_match table of the
+#        GeneYenta DB.
+#        Returns a list of Match objects.
+#
+#        """
+#
+#        sql = "SELECT id, patient_id, matched_patient_id, is_read, " \
+#              "is_important, score, last_matched, notes " \
+#              "FROM matches_match"
+#        cur = self.db.cursor()
+#        cur.execute(sql)
+#        rows = cur.fetchall()
+#        matches = []
+#        for row in rows:
+#            #print row
+#            #dt = datetime.strptime(row[6], "%Y-%m-%d %H:%M:%S")
+#            matches.append(
+#                Match(
+#                    #row[0], row[1], row[2], row[3], row[4], row[5], dt, row[7]
+#                    row[0], row[1], row[2], row[3], row[4], row[5], row[6],
+#                    row[7]
+#                )
+#            )
+#
+#        return matches
 
     def insertMatch(self, match):
         """
@@ -473,10 +486,10 @@ class GYMatcher:
 
         """
 
-        print "Getting match percent for patients {0} and {1}".format(
-            patient1.id,
-            patient2.id
-        )
+        #print "Getting match percent for patients {0} and {1}".format(
+        #    patient1.id,
+        #    patient2.id
+        #)
 
         if not patient1.terms:
             self.fetchPatientPhenoTerms(patient1)
@@ -512,7 +525,7 @@ class GYMatcher:
         matchNumerator = 0
         matchDenominator = 0
         for p1_term in patient1.terms:
-            print "term to match = {0}".format(p1_term)
+            #print "term to match = {0}".format(p1_term)
 
             matchDenominator += (p1_term.clinician_score * p1_term.term_score)
 
@@ -521,7 +534,7 @@ class GYMatcher:
             )
 
             if best_match:
-                print "best term match = {0}".format(best_match)
+                #print "best term match = {0}".format(best_match)
 
                 matchNumerator += (
                     p1_term.clinician_score * best_match.term_score
@@ -531,8 +544,8 @@ class GYMatcher:
                 #print "WARNING: term {0} not matched!!!".format(p1_term)
                 logging.error("term {0} not matched!!!".format(p1_term))
 
-        print "match numerator {0}".format(matchNumerator)
-        print "match denominator {0}".format(matchDenominator)
+        #print "match numerator {0}".format(matchNumerator)
+        #print "match denominator {0}".format(matchDenominator)
 
         match_score = 0
         if matchDenominator > 0:
@@ -624,7 +637,7 @@ class GYMatcher:
                 existing_match.last_matched = datetime.utcnow()
 
                 self.updateMatch(existing_match)
-                self.updated_matches.append(existing_match)
+                #self.updated_matches.append(existing_match)
         else:
             score = self.getPatientMatchPercent(patient1, patient2)
 
@@ -638,7 +651,7 @@ class GYMatcher:
             )
 
             self.insertMatch(new_match)
-            self.new_matches.append(new_match)
+            #self.new_matches.append(new_match)
 
     def matchPatientToAll(self, patient, force):
         """
@@ -670,6 +683,8 @@ class GYMatcher:
 
         patients = self.fetchAllPatients()
 
+        match_count = 0
+        match_startdate = datetime.now()
         for patient1 in patients:
             for patient2 in patients:
                 if patient1.id < patient2.id:
@@ -682,16 +697,28 @@ class GYMatcher:
                     # DJA 2014/05/14
                     # and patient1.clinician_id != patient2.clinician_id:
                     #
+
+                    if match_count % 100 == 0:
+                        elapsed_time = datetime.now() - match_startdate
+                        print "match operations = {1}\telapsed time = {0}".format(elapsed_time, match_count)
+
                     self.matchPatientToPatient(patient1, patient2, force)
                     self.matchPatientToPatient(patient2, patient1, force)
 
+                    match_count += 1
+
     def notifyMatchProcessTimedOut(self):
-        msg = MIMEText("A GeneYenta matching process timed out waiting for a previous matching process to complete at {0}".format(datetime.now()))
-        msg['Subject'] = 'GeneYenta matching process failed'
-        msg['From'] = ADMIN_EMAIL
-        msg['To'] = ADMIN_EMAIL
+        msg = "A GeneYenta matching process timed out waiting for a previous matching process to complete at {0}\n".format(datetime.now())
+
+        print msg
+
+        mime_msg = MIMEText(raw_msg)
+
+        mime_msg['Subject'] = 'GeneYenta matching process failed'
+        mime_msg['From'] = ADMIN_EMAIL
+        mime_msg['To'] = ADMIN_EMAIL
         s = smtplib.SMTP('localhost')
-        s.sendmail(ADMIN_EMAIL, [ADMIN_EMAIL], msg.as_string())
+        s.sendmail(ADMIN_EMAIL, [ADMIN_EMAIL], mime_msg.as_string())
         s.quit()
 
 
