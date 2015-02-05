@@ -34,8 +34,8 @@ class Match(models.Model):
 	patient = models.ForeignKey(Patient, related_name='+')
 	matched_patient = models.ForeignKey(Patient, related_name='+')
 
-	is_read = models.BooleanField() #unread feature like e-mail
-	is_important = models.BooleanField() #user-supplied flag
+	is_read = models.BooleanField(default=False) #unread feature like e-mail
+	is_important = models.BooleanField(default=False) #user-supplied flag
 	score = models.FloatField() #created by the match.py script
 	last_matched = models.DateTimeField() #date last matched, created in match.py
 	notes = models.CharField(max_length=450) #added by the user 

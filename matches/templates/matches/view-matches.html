@@ -24,7 +24,7 @@
 		{% for patient_id_key, match_list in match_dict.items %}
 
 			<li >
-				<h4 data-toggle="collapse" data-target="#list{{patient_id_key}}" onmouseover='nhpup.popup("Click to show more matches.")'> Matches for with GeneYenta ID: {{patient_id_key}} <small> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<h4 data-toggle="collapse" data-target="#list{{patient_id_key}}" onmouseover='nhpup.popup("Click to show more matches.")'> Matches for your case with GeneYenta ID {{patient_id_key}} <small> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 					New (
 					<div class="notification">
 						{{unread_dict|get_item:patient_id_key}}

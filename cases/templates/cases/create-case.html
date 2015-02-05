@@ -12,7 +12,7 @@
     <h4>General Information</h4>
     <div class="row">
         <div class="col-lg-8 col-12">
-        <p>Please fill in these forms to provide basic information about your patient. Please note that the "Private Identifier" will not be shared with any other user, but all other information will be visible to medical professionals with cases that match your own.</p>
+        <p>Please fill in these forms to provide basic information about your patient. Please note that the "Private Case Identifier" will not be shared with any other clinician, but all other information will be visible to medical professionals with cases that match your own.</p>
         </div>
     </div>
         <form name='patient-form' id="form" method="POST">
@@ -22,8 +22,8 @@
             <div class="row">
                 <div class="col-lg-6 col-12">
                     <dl class="">
-                        <dt> Private Identifier</br>
-                            <small>This is a confidential identifier used to reference a patient's medical records (e.g. a chart number or medical file number). It is for your personal organization only. 
+                        <dt>Private Case Identifier</br>
+                            <small>This is an identifier used to reference the GeneYenta record back to a patient's medical records. It is intended to be a mnemonic only for your personal organization. Although this identifier is not visible to other clinicians using the GeneYenta system, for privacy and security reasons it is advised that you <b>DO NOT</b> use an actual patient chart ID or other code that could be potentially patient identifying.
                             </small>
                         </dt>
                         <dd>{{patientform.private_id}}</dd>
